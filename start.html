@@ -236,6 +236,43 @@
             }
         }
 
+        /* 滚动提示文字 */
+        .scroll-hint {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 2px;
+            text-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.5),
+                0 2px 8px rgba(0, 0, 0, 0.4);
+            animation: fadeInUp 2s ease-out forwards, pulse 2s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateX(-50%) translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
         /* 向下箭头 - 添加发光效果 */
         .scroll-indicator {
             position: absolute;
@@ -661,7 +698,8 @@
                     </button>
                 </div>
             </div>
-
+            
+            <p class="scroll-hint">下滑查看详情介绍</p> 
             <div class="scroll-indicator" onclick="scrollToPage(2)">
                 <i class="fas fa-chevron-down"></i>
             </div>
@@ -722,7 +760,7 @@
                         <i class="fas fa-align-left"></i>
                     </div>
                     <h2>动态歌词</h2>
-                    <p>逐字精准滚动，让你跟唱更轻松，沉浸在音乐的每一个字符中。</p>
+                    <p>逐字精准滚动,让你跟唱更轻松，沉浸在音乐的每一个字符中。</p>
                 </div>
 
                 <div class="feature-right">
