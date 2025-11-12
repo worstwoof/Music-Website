@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐世界 | 我的音乐</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-blue: #01230f;
+            --deep-blue: #1B305D;
+            --purple-blue: #423B63;
+            --light-purple: #AF7DAC;
+            --light-pink: #F5DADF;
+            --orange: #F2926E;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--deep-blue) 100%);
+            color: var(--light-pink);
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        /* 与首页完全一致的导航栏样式 */
+        .header {
+            background: rgba(255, 255, 255, 0);
+            backdrop-filter: blur(0px);
+            padding: 15px 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            transition: all 0.4s ease;
+        }
+
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            display: flex;
+            align-items: center;
+            transition: color 0.4s ease;
+        }
+
+        .header.scrolled .logo {
+            color: #423b63;
+        }
+
+        .logo i {
+            margin-right: 8px;
+            font-size: 26px;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+            margin: 0 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled .search-input {
+            border-color: #f5dadf;
+            background: #fafafa;
+            color: #333;
+        }
+
+        .search-input:focus {
+            border-color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header.scrolled .search-input:focus {
+            border-color: #af7dac;
+            background: white;
+            box-shadow: 0 0 10px rgba(175, 125, 172, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .header.scrolled .search-input::placeholder {
+            color: #aaa;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .header.scrolled .search-icon {
+            color: #af7dac;
+        }
+
+        .nav-options {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .header.scrolled .nav-item {
+            color: #423b63;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .header.scrolled .nav-item:hover {
+            background: #f5dadf;
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header.scrolled .nav-item.active {
+            background: #af7dac;
+            color: white;
+        }
+
+        .login-register {
+            padding: 8px 16px;
+            background: linear-gradient(
+                135deg,
+                rgba(175, 125, 172, 0.8),
+                rgba(242, 146, 110, 0.8)
+            );
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled .login-register {
+            background: linear-gradient(135deg, #af7dac, #f2926e);
+        }
+
+        .login-register:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        /* 我的音乐界面 */
+        .my-music-section {
+            padding: 100px 20px 120px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+        }
+        
+        /* 侧边栏样式 */
+        .sidebar {
+            background-color: rgba(27, 48, 93, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .profile {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(245, 218, 223, 0.2);
+            margin-bottom: 20px;
+        }
+        
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--orange);
+            margin-bottom: 15px;
+        }
+        
+        .profile h2 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        
+        .profile p {
+            font-size: 0.9rem;
+            color: rgba(245, 218, 223, 0.8);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--orange);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: rgba(245, 218, 223, 0.7);
+        }
+        
+        .nav-menu {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .nav-item-music {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            color: var(--light-pink);
+        }
+        
+        .nav-item-music i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-item-music:hover {
+            background-color: rgba(175, 125, 172, 0.2);
+        }
+        
+        .nav-item-music.active {
+            background-color: var(--purple-blue);
+            color: var(--orange);
+        }
+        
+        /* 主内容区样式 */
+        .main-content {
+            background-color: rgba(27, 48, 93, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-music {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .header-music h1 {
+            font-size: 1.8rem;
+            color: var(--orange);
+        }
+        
+        .search-bar-music {
+            display: flex;
+            background: rgba(66, 59, 99, 0.6);
+            border-radius: 20px;
+            padding: 8px 15px;
+            width: 300px;
+        }
+        
+        .search-bar-music input {
+            background: transparent;
+            border: none;
+            color: var(--light-pink);
+            width: 100%;
+            outline: none;
+            padding: 0 10px;
+        }
+        
+        .search-bar-music i {
+            color: var(--light-purple);
+        }
+        
+        .section-title-music {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 25px 0 15px;
+        }
+        
+        .section-title-music h2 {
+            font-size: 1.4rem;
+        }
+        
+        .section-title-music a {
+            color: var(--orange);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        /* 音乐网格样式 */
+        .music-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .music-card {
+            background: rgba(66, 59, 99, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .music-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .album-cover {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        
+        .music-info {
+            padding: 12px;
+        }
+        
+        .music-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .music-artist {
+            font-size: 0.8rem;
+            color: rgba(245, 218, 223, 0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* 播放列表样式 */
+        .playlist {
+            background: rgba(66, 59, 99, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .playlist-header {
+            display: grid;
+            grid-template-columns: 50px 3fr 2fr 1fr 60px;
+            padding: 15px 20px;
+            background: rgba(27, 48, 93, 0.5);
+            color: var(--orange);
+            font-size: 0.9rem;
+        }
+        
+        .playlist-item {
+            display: grid;
+            grid-template-columns: 50px 3fr 2fr 1fr 60px;
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(245, 218, 223, 0.1);
+            align-items: center;
+            transition: background 0.2s;
+        }
+        
+        .playlist-item:hover {
+            background: rgba(175, 125, 172, 0.2);
+        }
+        
+        .playlist-item.active {
+            background: rgba(242, 146, 110, 0.2);
+        }
+        
+        .playlist-number {
+            color: rgba(245, 218, 223, 0.7);
+        }
+        
+        .playlist-title {
+            display: flex;
+            align-items: center;
+        }
+        
+        .playlist-title img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 12px;
+        }
+        
+        .playlist-actions i {
+            margin-left: 10px;
+            cursor: pointer;
+            color: rgba(245, 218, 223, 0.7);
+            transition: color 0.2s;
+        }
+        
+        .playlist-actions i:hover {
+            color: var(--orange);
+        }
+        
+        /* 播放器控件样式 */
+        .player-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to right, var(--dark-blue), var(--purple-blue));
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+        
+        .now-playing {
+            display: flex;
+            align-items: center;
+            width: 25%;
+        }
+        
+        .now-playing img {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+        
+        .track-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+        
+        .track-info p {
+            font-size: 0.8rem;
+            color: rgba(245, 218, 223, 0.7);
+        }
+        
+        .player-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50%;
+        }
+        
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .control-buttons i {
+            font-size: 1.2rem;
+            margin: 0 15px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .control-buttons i:hover {
+            color: var(--orange);
+        }
+        
+        .control-buttons .play-pause {
+            font-size: 1.8rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(245, 218, 223, 0.2);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .progress {
+            position: absolute;
+            height: 100%;
+            background: var(--orange);
+            border-radius: 2px;
+            width: 30%;
+        }
+        
+        .time {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 0.7rem;
+            margin-top: 5px;
+            color: rgba(245, 218, 223, 0.7);
+        }
+        
+        .player-right {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 25%;
+        }
+        
+        .player-right i {
+            margin-left: 20px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .volume-bar {
+            width: 100px;
+            height: 4px;
+            background: rgba(245, 218, 223, 0.2);
+            border-radius: 2px;
+            position: relative;
+            margin-left: 10px;
+        }
+        
+        .volume-level {
+            position: absolute;
+            height: 100%;
+            background: var(--light-purple);
+            border-radius: 2px;
+            width: 70%;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .music-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .header-music {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .search-bar-music {
+                width: 100%;
+                margin-top: 15px;
+            }
+            
+            .music-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+            
+            .playlist-header, .playlist-item {
+                grid-template-columns: 30px 2fr 1fr 40px;
+            }
+            
+            .playlist-album {
+                display: none;
+            }
+            
+            .player-controls {
+                padding: 10px 15px;
+            }
+            
+            .now-playing {
+                width: 40%;
+            }
+            
+            .player-center {
+                width: 60%;
+            }
+            
+            .player-right {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 与首页完全一致的导航栏 -->
+    <header class="header" id="header">
+        <div class="logo"><i class="fas fa-music"></i> 音乐世界</div>
+
+        <div class="search-container">
+            <input
+                type="text"
+                class="search-input"
+                placeholder="搜索音乐、歌手、歌单..."
+            />
+            <span class="search-icon"><i class="fas fa-search"></i></span>
+        </div>
+
+        <div class="nav-options">
+            <div class="nav-item" onclick="navigateTo('home')">
+                <i class="fas fa-home"></i> 首页
+            </div>
+            <div class="nav-item" onclick="navigateTo('discover')">
+                <i class="fas fa-compass"></i> 发现
+            </div>
+            <div class="nav-item active">
+                <i class="fas fa-music"></i> 我的音乐
+            </div>
+            <div class="nav-item" onclick="navigateTo('mv')">
+                <i class="fas fa-video"></i> MV
+            </div>
+        </div>
+
+        <div class="login-register" onclick="showLoginModal()">登录/注册</div>
+    </header>
+
+    <!-- 我的音乐界面 -->
+    <section id="mymusic" class="my-music-section">
+        <div class="container">
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <div class="profile">
+                    <img src="https://th.bing.com/th/id/OIP.oFazgA0xj09WmTqa4k3nRAAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3" alt="用户头像" class="profile-img">
+                    <h2>DOGE</h2>
+                    <p>音乐爱好者</p>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">128</div>
+                        <div class="stat-label">收藏</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">歌单</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1,256</div>
+                        <div class="stat-label">粉丝</div>
+                    </div>
+                </div>
+                
+                <ul class="nav-menu">
+                    <li class="nav-item-music active"><i class="fas fa-home"></i> 我的主页</li>
+                    <li class="nav-item-music"><i class="fas fa-heart"></i> 我的收藏</li>
+                    <li class="nav-item-music"><i class="fas fa-history"></i> 最近播放</li>
+                    <li class="nav-item-music"><i class="fas fa-list"></i> 我的歌单</li>
+                    <li class="nav-item-music"><i class="fas fa-download"></i> 本地音乐</li>
+                    <li class="nav-item-music"><i class="fas fa-cog"></i> 设置</li>
+                </ul>
+            </div>
+            
+            <!-- 主内容区 -->
+            <div class="main-content">
+                <div class="header-music">
+                    <h1>我的音乐</h1>
+                    <div class="search-bar-music">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="搜索音乐、歌手、专辑...">
+                    </div>
+                </div>
+                
+                <div class="section-title-music">
+                    <h2>收藏的音乐</h2>
+                    <a href="#">查看全部 <i class="fas fa-chevron-right"></i></a>
+                </div>
+                
+                <div class="music-grid">
+                    <div class="music-card">
+                        <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面" class="album-cover">
+                        <div class="music-info">
+                            <div class="music-title">夏日微风</div>
+                            <div class="music-artist">林悦</div>
+                        </div>
+                    </div>
+                    
+                    <div class="music-card">
+                        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面" class="album-cover">
+                        <div class="music-info">
+                            <div class="music-title">星辰大海</div>
+                            <div class="music-artist">陈星</div>
+                        </div>
+                    </div>
+                    
+                    <div class="music-card">
+                        <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面" class="album-cover">
+                        <div class="music-info">
+                            <div class="music-title">城市夜晚</div>
+                            <div class="music-artist">张浩</div>
+                        </div>
+                    </div>
+                    
+                    <div class="music-card">
+                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面" class="album-cover">
+                        <div class="music-info">
+                            <div class="music-title">雨中的旋律</div>
+                            <div class="music-artist">王心怡</div>
+                        </div>
+                    </div>
+                    
+                    <div class="music-card">
+                        <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面" class="album-cover">
+                        <div class="music-info">
+                            <div class="music-title">远方的路</div>
+                            <div class="music-artist">旅行者乐队</div>
+                        </div>
+                    </div>
+                    
+                    <div class="music-card">
+                        <img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面" class="album-cover">
+                        <div class="music-info">
+                            <div class="music-title">月光奏鸣曲</div>
+                            <div class="music-artist">李明月</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-title-music">
+                    <h2>最近播放</h2>
+                    <a href="#">查看全部 <i class="fas fa-chevron-right"></i></a>
+                </div>
+                
+                <div class="playlist">
+                    <div class="playlist-header">
+                        <div>#</div>
+                        <div>歌曲标题</div>
+                        <div>歌手</div>
+                        <div>专辑</div>
+                        <div><i class="far fa-clock"></i></div>
+                    </div>
+                    
+                    <div class="playlist-item active">
+                        <div class="playlist-number">1</div>
+                        <div class="playlist-title">
+                            <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面">
+                            <div>夏日微风</div>
+                        </div>
+                        <div>林悦</div>
+                        <div>夏日记忆</div>
+                        <div>3:45</div>
+                    </div>
+                    
+                    <div class="playlist-item">
+                        <div class="playlist-number">2</div>
+                        <div class="playlist-title">
+                            <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面">
+                            <div>星辰大海</div>
+                        </div>
+                        <div>陈星</div>
+                        <div>星空</div>
+                        <div>4:20</div>
+                    </div>
+                    
+                    <div class="playlist-item">
+                        <div class="playlist-number">3</div>
+                        <div class="playlist-title">
+                            <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面">
+                            <div>城市夜晚</div>
+                        </div>
+                        <div>张浩</div>
+                        <div>都市情缘</div>
+                        <div>3:55</div>
+                    </div>
+                    
+                    <div class="playlist-item">
+                        <div class="playlist-number">4</div>
+                        <div class="playlist-title">
+                            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面">
+                            <div>雨中的旋律</div>
+                        </div>
+                        <div>王心怡</div>
+                        <div>雨季</div>
+                        <div>4:10</div>
+                    </div>
+                    
+                    <div class="playlist-item">
+                        <div class="playlist-number">5</div>
+                        <div class="playlist-title">
+                            <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="专辑封面">
+                            <div>远方的路</div>
+                        </div>
+                        <div>旅行者乐队</div>
+                        <div>在路上</div>
+                        <div>5:15</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 播放器控件 -->
+    <div class="player-controls">
+        <div class="now-playing">
+            <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="当前播放">
+            <div class="track-info">
+                <h4>夏日微风</h4>
+                <p>林悦</p>
+            </div>
+            <i class="far fa-heart"></i>
+        </div>
+        
+        <div class="player-center">
+            <div class="control-buttons">
+                <i class="fas fa-random"></i>
+                <i class="fas fa-step-backward"></i>
+                <i class="fas fa-play-circle play-pause"></i>
+                <i class="fas fa-step-forward"></i>
+                <i class="fas fa-redo"></i>
+            </div>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <div class="time">
+                <span>1:25</span>
+                <span>3:45</span>
+            </div>
+        </div>
+        
+        <div class="player-right">
+            <i class="fas fa-list"></i>
+            <i class="fas fa-volume-up"></i>
+            <div class="volume-bar">
+                <div class="volume-level"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登录弹窗 - 添加与首页相同的登录弹窗 -->
+    <!-- <div class="modal-overlay" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeLoginModal()">&times;</span>
+            <h2 class="modal-title">登录音乐世界</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">用户名或邮箱</label>
+                    <input
+                        type="text"
+                        id="username"
+                        class="form-input"
+                        placeholder="请输入用户名或邮箱"
+                        required
+                    />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <input
+                        type="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="请输入密码"
+                        required
+                    />
+                </div>
+                <button type="submit" class="login-btn">登录</button>
+            </form>
+            <div class="modal-footer">
+                <p>还没有账号？<a href="#">立即注册</a></p>
+                <p><a href="#">忘记密码？</a></p>
+            </div>
+        </div>
+    </div> -->
+
+    <script>
+        // 导航栏滚动效果 - 与首页一致
+        const header = document.getElementById("header");
+
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > 50) {
+                header.classList.add("scrolled");
+            } else {
+                header.classList.remove("scrolled");
+            }
+        });
+
+        // 页面导航功能
+        function navigateTo(page) {
+            if (page === 'home') {
+                window.location.href = 'Homepage-Frame.html';
+            } else if (page === 'discover') {
+                // 这里可以跳转到发现页面
+                alert('跳转到发现页面');
+            } else if (page === 'mymusic') {
+                // 当前页面，不需要跳转
+            } else if (page === 'mv') {
+                // 这里可以跳转到MV页面
+                alert('跳转到MV页面');
+            }
+        }
+
+        // 登录/注册弹窗功能 - 与首页一致
+        const loginModal = document.getElementById("loginModal");
+
+        function showLoginModal() {
+            loginModal.style.display = "flex";
+        }
+
+        function closeLoginModal() {
+            loginModal.style.display = "none";
+        }
+
+        // 点击弹窗外部关闭
+        loginModal.addEventListener("click", function (event) {
+            if (event.target === loginModal) {
+                closeLoginModal();
+            }
+        });
+
+        // 登录表单提交
+        document
+            .getElementById("loginForm")
+            .addEventListener("submit", function (event) {
+                event.preventDefault();
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+
+                // 这里可以添加实际的登录逻辑------------------------------------------
+                alert(`登录成功！欢迎 ${username}`);
+                closeLoginModal();
+            });
+
+        // 搜索功能 - 与首页一致
+        const searchInput = document.querySelector(".search-input");
+        const searchIcon = document.querySelector(".search-icon");
+
+        function performSearch() {
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm) {
+                alert("搜索: " + searchTerm);
+            }
+        }
+
+        searchInput.addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                performSearch();
+            }
+        });
+
+        searchIcon.addEventListener("click", performSearch);
+
+        // 播放器功能
+        document.querySelector('.play-pause').addEventListener('click', function() {
+            if (this.classList.contains('fa-play-circle')) {
+                this.classList.remove('fa-play-circle');
+                this.classList.add('fa-pause-circle');
+            } else {
+                this.classList.remove('fa-pause-circle');
+                this.classList.add('fa-play-circle');
+            }
+        });
+        
+        // 切换收藏状态
+        document.querySelector('.fa-heart').addEventListener('click', function() {
+            if (this.classList.contains('far')) {
+                this.classList.remove('far');
+                this.classList.add('fas');
+                this.style.color = 'var(--orange)';
+            } else {
+                this.classList.remove('fas');
+                this.classList.add('far');
+                this.style.color = '';
+            }
+        });
+        
+        // 点击音乐卡片时更新播放器
+        document.querySelectorAll('.music-card, .playlist-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // 更新播放列表中的活动项
+                document.querySelectorAll('.playlist-item').forEach(el => {
+                    el.classList.remove('active');
+                });
+                
+                if (this.classList.contains('playlist-item')) {
+                    this.classList.add('active');
+                }
+                
+                // 更新当前播放信息
+                const title = this.querySelector('.music-title, .playlist-title div:last-child').textContent;
+                const artist = this.querySelector('.music-artist, .playlist-item div:nth-child(3)').textContent;
+                const cover = this.querySelector('img').src;
+                
+                document.querySelector('.now-playing img').src = cover;
+                document.querySelector('.track-info h4').textContent = title;
+                document.querySelector('.track-info p').textContent = artist;
+                
+                // 开始播放
+                document.querySelector('.play-pause').classList.remove('fa-play-circle');
+                document.querySelector('.play-pause').classList.add('fa-pause-circle');
+            });
+        });
+    </script>
+</body>
+</html>
