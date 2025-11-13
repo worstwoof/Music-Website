@@ -1,0 +1,1246 @@
+/*
+ * style.css
+ * 音乐播放器融合版样式表 (V2)
+ *
+ * 1.  全局设置与 CSS 变量 (主题)
+ * 2.  基础与通用样式
+ * 3.  顶部导航栏 (来自 02)
+ * 4.  全屏轮播图 (来自 02, V2 修复)
+ * 5.  新增: 锚点侧边栏 (V2 可拖动)
+ * 6.  内容区域 (来自 02 标题)
+ * 7.  内容轮播 (新) 与 混合卡片 (01+02, V2 卡片加大)
+ * 8.  【V2 新增】: 排行榜 (来自 01)
+ * 9.  页脚 (来自 01 结构)
+ * 10. 登录弹窗 (来自 02)
+ * 11. 响应式设计
+ */
+
+/* * =======================================
+ * 1. 全局设置与 CSS 变量 (主题)
+ * =======================================
+ */
+:root {
+  /* 字体 (来自 02) */
+  --font-main: "Arial", sans-serif;
+
+  /* 【V2 新增】: 排行榜明亮颜色 (来自 01) */
+  --color-chart-1: #f2926e;
+  --color-chart-2: #af7dac;
+  --color-chart-3: #3f88c5;
+  --color-chart-4: #6a994e;
+  /* 排行榜次要文本 (用于暗色模式) */
+  --text-chart-secondary: #666;
+
+  /* * ----- 模式 1: 明亮模式 (默认) -----
+   * (完全采用 02 的颜色方案)
+   */
+  --bg-body: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  --bg-header: rgba(255, 255, 255, 0);
+  --bg-header-scrolled: rgba(255, 255, 255, 0.8);
+  --bg-card: #ffffff;
+  --bg-modal: #ffffff;
+  --bg-input: #fafafa;
+  --bg-input-focus: #ffffff;
+  --bg-footer: linear-gradient(135deg, #423b63, #1b305d);
+
+  --text-primary: #333;
+  --text-secondary: #666;
+  --text-header: #ffffff;
+  --text-header-scrolled: #423b63;
+  --text-hero-title: #ffffff;
+  --text-hero-subtitle: #f5dadf;
+  --text-footer: #f5dadf;
+
+  --color-brand-1: #423b63;
+  --color-brand-2: #af7dac;
+  --color-brand-3: #f2926e;
+  --color-brand-gradient: linear-gradient(
+    135deg,
+    var(--color-brand-2),
+    var(--color-brand-3)
+  );
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-border: #f5dadf;
+  --color-border-input: #f5dadf;
+  --color-border-input-focus: #af7dac;
+  /* 排行榜列表分割线 */
+  --color-chart-border: #f0f0f0;
+}
+
+/* * ----- 模式 2: 暗色模式 -----
+ * (基于 02 设计，加入 01 的深色背景 和 02 的亮色点缀)
+ */
+body.dark-mode {
+  --bg-body: #011230;
+  /* 01 的深空蓝 */
+  --bg-header: #011230;
+  --bg-header-scrolled: rgba(27, 48, 93, 0.8);
+  /* 01 的深海蓝 (透明) */
+  --bg-card: #1b305d;
+  /* 01 的深海蓝 */
+  --bg-modal: #1b305d;
+  --bg-input: #011230;
+  --bg-input-focus: #1b305d;
+  --bg-footer: #011230;
+  /* 页脚与背景同色 */
+
+  --text-primary: #f5dadf;
+  /* 01 的樱花粉 (主文本) */
+  --text-secondary: #af7dac;
+  /* 01 的薰衣草 (次要文本) */
+  --text-header: #f5dadf;
+  --text-header-scrolled: #f5dadf;
+  --text-hero-title: #ffffff;
+  --text-hero-subtitle: #f5dadf;
+  --text-footer: #af7dac;
+
+  --color-brand-1: #f5dadf;
+  /* 品牌色 1 反转为亮色 */
+  --color-brand-2: #af7dac;
+  /* 02 的紫色 (作为点缀) */
+  --color-brand-3: #f2926e;
+  /* 02 的橙色 (作为点缀) */
+  --color-brand-gradient: linear-gradient(
+    135deg,
+    var(--color-brand-2),
+    var(--color-brand-3)
+  );
+  --color-shadow: rgba(0, 0, 0, 0.2);
+  --color-border: #423b63;
+  /* 01 的暮色紫 (边框) */
+  --color-border-input: #423b63;
+  --color-border-input-focus: #f2926e;
+  /* 焦点用亮橙色 */
+
+  /* 【V2】排行榜暗色模式适配 */
+  --color-chart-border: #423b63;
+  --text-chart-secondary: var(--text-secondary);
+  /* 保持排行榜颜色明亮 */
+  --color-chart-1: #f2926e;
+  --color-chart-2: #af7dac;
+  --color-chart-3: #5aa4e6;
+  /* 蓝色调亮 */
+  --color-chart-4: #8bc34a;
+  /* 绿色调亮 */
+}
+
+/* * =======================================
+ * 2. 基础与通用样式
+ * =======================================
+ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* 平滑滚动 */
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background 0.4s ease;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* * =======================================
+ * 3. 顶部导航栏 (来自 02)
+ * =======================================
+ */
+/* 全屏轮播容器 */
+.fullscreen-carousel {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden; /* 隐藏超出容器的内容 */
+}
+
+/* 固定背景图（保持模糊效果） */
+.carousel-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("images/轮播图背景.png"); /* 你的背景图路径 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(8px); /* 模糊效果，可调整数值 */
+  -webkit-filter: blur(8px);
+  z-index: 0;
+}
+
+/* 遮罩层（增强文字可读性） */
+.slide-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明黑色遮罩 */
+  z-index: 1;
+}
+
+/* 轮播内容容器（文字父级） */
+.carousel-slides {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2; /* 确保文字在最上层 */
+}
+
+/* 单个轮播项（文字容器） */
+.carousel-slide {
+  position: absolute; /* 绝对定位，让所有轮播项重叠 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0; /* 默认隐藏 */
+  transform: scale(0.95); /* 轻微缩放，增强过渡层次感 */
+  transition: all 0.8s ease-in-out; /* 过渡动画：0.8秒平滑过渡 */
+}
+
+/* 激活的轮播项（显示状态） */
+.carousel-slide.active {
+  opacity: 1; /* 完全显示 */
+  transform: scale(1); /* 恢复原尺寸 */
+}
+
+/* 导航点样式（保持原位置，微调激活态） */
+.carousel-nav {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 3;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5); /* 未激活态：半透明白色 */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.carousel-dot.active {
+  background-color: #fff; /* 激活态：纯白色 */
+  transform: scale(1.2); /* 轻微放大，突出激活态 */
+}
+
+/* 箭头样式（保持原位置，微调 hover 效果） */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  z-index: 3;
+  transition: all 0.3s ease;
+  padding: 0 20px;
+}
+
+.carousel-arrow.left {
+  left: 20px;
+}
+
+.carousel-arrow.right {
+  right: 20px;
+}
+
+.carousel-arrow:hover {
+  color: #fff;
+  transform: translateY(-50%) scale(1.1); /* hover 时放大并加深颜色 */
+}
+
+.header {
+  background: var(--bg-header);
+  backdrop-filter: blur(0px);
+  padding: 15px 5%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  transition: all 0.4s ease;
+}
+
+.header.scrolled {
+  background: var(--bg-header-scrolled);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px var(--color-shadow);
+}
+
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-header);
+  display: flex;
+  align-items: center;
+  transition: color 0.4s ease;
+}
+
+.header.scrolled .logo {
+  color: var(--text-header-scrolled);
+}
+
+.logo i {
+  margin-right: 8px;
+  font-size: 26px;
+}
+
+.search-container {
+  flex: 1;
+  max-width: 400px;
+  position: relative;
+  margin: 0 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 45px 12px 15px;
+  border: 2px solid var(--color-border-input);
+  border-radius: 25px;
+  font-size: 16px;
+  outline: none;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: var(--color-border-input-focus);
+  background: var(--bg-input-focus);
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-brand-2);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.nav-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* V2 减小 gap 以容纳更多项 */
+  flex-wrap: wrap;
+  /* V2 允许换行 */
+}
+
+.nav-item {
+  cursor: pointer;
+  padding: 8px 10px;
+  /* V2 减小 padding */
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-header);
+  font-size: 14px;
+}
+
+.header.scrolled .nav-item {
+  color: var(--text-header-scrolled);
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: var(--color-brand-2);
+  color: white;
+}
+
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-register {
+  padding: 8px 16px;
+  background: var(--color-brand-gradient);
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 14px;
+}
+
+.login-register:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+/* 主题切换按钮样式 */
+.theme-toggle {
+  background: var(--bg-input);
+  color: var(--color-brand-2);
+  border: 2px solid var(--color-border-input);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-brand-3);
+  color: var(--color-brand-3);
+}
+
+/* 默认显示月亮 (明亮模式) */
+.theme-toggle .sun-icon {
+  display: none;
+}
+
+.theme-toggle .moon-icon {
+  display: block;
+}
+
+/* 暗色模式下显示太阳 */
+body.dark-mode .theme-toggle .sun-icon {
+  display: block;
+}
+
+body.dark-mode .theme-toggle .moon-icon {
+  display: none;
+}
+
+/* * =======================================
+ * 4. 全屏轮播图 (来自 02, V2 修复)
+ * =======================================
+ */
+.fullscreen-carousel {
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-slides {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s ease-in-out;
+}
+
+/* 【V2 修复】: 使用 <img> 标签的结构 */
+.carousel-slide {
+  min-width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(66, 59, 99, 0.3),
+    rgba(27, 48, 93, 0.5)
+  );
+  z-index: 1;
+  /* 确保在图片之上 */
+}
+
+.slide-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  text-align: center;
+  max-width: 80%;
+  z-index: 2;
+  /* 确保在遮罩之上 */
+}
+
+/* 轮播图标题、副标题、按钮样式*/
+.slide-title {
+  font-size: 80px;
+  font-family: "Great Vibes", cursive;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: var(--text-hero-title);
+}
+
+.slide-subtitle {
+  font-size: 28px;
+  font-family: "Great Vibes", cursive;
+  margin-bottom: 30px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  font-weight: 300;
+  color: var(--text-hero-subtitle);
+}
+
+.carousel-nav {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-dot.active {
+  background-color: var(--color-brand-3);
+  /* 使用橙色高亮 */
+  transform: scale(1.2);
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 20px;
+}
+
+.carousel-arrow:hover {
+  background-color: rgba(242, 146, 110, 0.7);
+  /* 悬停时用橙色 */
+}
+
+.carousel-arrow.left {
+  left: 20px;
+}
+
+.carousel-arrow.right {
+  right: 20px;
+}
+
+/* * =======================================
+ * 5. 新增: 锚点侧边栏 (V2 可拖动)
+ * =======================================
+ */
+.sidebar-nav {
+  position: fixed;
+  /* 【V2 修改】: 移除 50% 居中，改为可变 top */
+  top: 150px;
+  right: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--bg-header-scrolled);
+  /* 使用导航栏滚动后的背景 */
+  padding: 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px var(--color-shadow);
+  cursor: grab;
+  /* 【V2 新增】: 抓取手势 */
+}
+
+/* 【V2 新增】: 拖动时的样式 */
+.sidebar-nav.dragging {
+  cursor: grabbing;
+  user-select: none;
+  /* 防止拖动时选中文本 */
+}
+
+.sidebar-link {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.sidebar-link:hover {
+  color: var(--color-brand-3);
+  /* 悬停用橙色 */
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-link.active {
+  color: white;
+  background: var(--color-brand-2);
+  /* 激活时用紫色 */
+}
+
+/* * =======================================
+ * 6. 内容区域 (来自 02 标题)
+ * =======================================
+ */
+.main-content-area {
+  /* 主要内容区域，与全屏轮播分开 */
+  padding: 80px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.content-section {
+  margin-bottom: 60px;
+}
+
+.section-title {
+  /* 标题采用 02 的居中样式 */
+  font-size: 28px;
+  color: var(--text-primary);
+  margin-bottom: 25px;
+  text-align: center;
+  font-weight: normal;
+}
+
+/* * =======================================
+ * 7. 内容轮播 (新) 与 混合卡片 (01+02, V2 卡片加大)
+ * =======================================
+ */
+.content-carousel-container {
+  position: relative;
+}
+
+.content-carousel {
+  overflow: hidden;
+  /* 隐藏轨道溢出部分 */
+}
+
+.content-track {
+  display: flex;
+  /* 轨道设为 flex 布局 */
+  gap: 20px;
+  /* 卡片间距 */
+  transition: transform 0.5s ease;
+}
+
+.content-card {
+  background: var(--bg-card);
+  border-radius: 15px;
+  box-shadow: 0 5px 20px var(--color-shadow);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+  /* 【V2 修改】: 卡片加大 */
+  flex-basis: 250px;
+  /* 原 220px */
+}
+
+.content-card.mv-card {
+  /* 【V2 修改】: MV 卡片加大 */
+  flex-basis: 340px;
+  /* 原 300px */
+}
+
+.content-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px var(--color-shadow);
+}
+
+.card-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  /* 歌曲卡片为方形 */
+  overflow: hidden;
+  border-radius: 15px 15px 0 0;
+}
+
+.content-card.mv-card .card-image {
+  aspect-ratio: 16 / 9;
+  /* MV 卡片为 16:9 */
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.content-card:hover .card-image img {
+  transform: scale(1.05);
+  /* 悬停时图片放大 */
+}
+
+/* 交互: 01 的悬停播放按钮 */
+.play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  opacity: 0;
+  /* 默认隐藏 */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 5;
+}
+
+.content-card:hover .play-icon {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.card-content {
+  padding: 15px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-artist {
+  font-size: 14px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 内容轮播的控制按钮 */
+.content-carousel-container .carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: var(--bg-card);
+  color: var(--color-brand-2);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px var(--color-shadow);
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-carousel-container .carousel-btn:hover {
+  background: var(--color-brand-2);
+  color: white;
+}
+
+.content-carousel-container .carousel-btn.prev {
+  left: -20px;
+}
+
+.content-carousel-container .carousel-btn.next {
+  right: -20px;
+}
+
+.content-carousel-container .carousel-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* * =======================================
+ * 8. 【V2 新增】: 排行榜 (来自 01)
+ * =======================================
+ * 采用 01 的 4 列网格布局，并使用 CSS 变量适配主题
+ */
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.chart-column {
+  background-color: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: 8px;
+  /* 01 的圆角 */
+  border-top: 4px solid var(--color-chart-1);
+  /* 默认颜色 */
+  box-shadow: 0 5px 20px var(--color-shadow);
+  transition: all 0.3s ease;
+}
+
+.chart-column:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px var(--color-shadow);
+}
+
+/* 01 的明亮颜色 */
+.chart-column:nth-child(1) {
+  border-top-color: var(--color-chart-1);
+}
+
+.chart-column:nth-child(2) {
+  border-top-color: var(--color-chart-2);
+}
+
+.chart-column:nth-child(3) {
+  border-top-color: var(--color-chart-3);
+}
+
+.chart-column:nth-child(4) {
+  border-top-color: var(--color-chart-4);
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.chart-list {
+  list-style: none;
+}
+
+.chart-list li {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--color-chart-border);
+  font-size: 0.95rem;
+  color: var(--text-chart-secondary);
+  /* 适配暗色模式 */
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.chart-list li:last-child {
+  border-bottom: none;
+}
+
+.chart-list li:hover {
+  /* 悬停时用主题色点缀 */
+  background-color: var(--bg-input-focus);
+  color: var(--text-primary);
+}
+
+.chart-list li span {
+  font-weight: bold;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-right: 0.75rem;
+  width: 1.5rem;
+  /* 保持对齐 */
+}
+
+/* 前三名高亮 (使用明亮色 1) */
+.chart-list li:nth-child(1) span,
+.chart-list li:nth-child(2) span,
+.chart-list li:nth-child(3) span {
+  color: var(--color-chart-1);
+}
+
+/* * =======================================
+ * 9. 页脚 (来自 01 结构)
+ * =======================================
+ */
+.site-footer {
+  background: var(--bg-footer);
+  border-top: 1px solid var(--color-border);
+  padding: 3rem 0;
+  color: var(--text-footer);
+  margin-top: 50px;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+.footer-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  font-size: 0.9rem;
+  color: var(--text-footer);
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--color-brand-3);
+  /* 悬停用橙色 */
+}
+
+.copyright {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* * =======================================
+ * 10. 登录弹窗 (来自 02)
+ * =======================================
+ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  /* 默认隐藏 */
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.show {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-content {
+  background: var(--bg-modal);
+  color: var(--text-primary);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.show .modal-content {
+  transform: translateY(0);
+}
+
+/* ... (弹窗内表单、按钮等样式同 V1) ... */
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+  color: var(--color-brand-2);
+}
+
+.modal-title {
+  font-size: 24px;
+  color: var(--text-primary);
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid var(--color-border-input);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  border-color: var(--color-border-input-focus);
+  background: var(--bg-input-focus);
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--color-brand-gradient);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.modal-footer {
+  margin-top: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.modal-footer a {
+  color: var(--color-brand-2);
+  text-decoration: none;
+}
+
+.modal-footer a:hover {
+  text-decoration: underline;
+}
+
+/* * =======================================
+ * 11. 响应式设计
+ * =======================================
+ */
+
+/* 平板电脑 */
+@media (max-width: 1024px) {
+  .header {
+    padding: 15px 2%;
+  }
+
+  .search-container {
+    max-width: 300px;
+  }
+
+  .nav-options {
+    gap: 5px;
+  }
+
+  .main-content-area {
+    padding: 60px 2%;
+  }
+
+  .content-carousel-container .carousel-btn.prev {
+    left: -10px;
+  }
+
+  .content-carousel-container .carousel-btn.next {
+    right: -10px;
+  }
+
+  .sidebar-nav {
+    right: 10px;
+  }
+
+  /* 【V2】排行榜 4 -> 2 */
+  .charts-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 小型平板与大型手机 */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .header-container {
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+  }
+
+  .search-container {
+    margin: 0;
+    max-width: 90%;
+  }
+
+  .nav-options {
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .nav-controls {
+    background: var(--bg-header-scrolled);
+    padding: 5px 10px;
+    border-radius: 25px;
+  }
+
+  .slide-title {
+    font-size: 40px;
+  }
+
+  .slide-subtitle {
+    font-size: 20px;
+  }
+
+  .main-content-area {
+    padding-top: 250px;
+    /* 【V2】为超高的固定导航栏留出更多空间 */
+  }
+
+  /* 【V2】卡片加大(平板) */
+  .content-card {
+    flex-basis: 220px;
+  }
+
+  /* 原 200px */
+  .content-card.mv-card {
+    flex-basis: 320px;
+  }
+
+  /* 原 280px */
+
+  /* 【V2】排行榜 2 -> 1 */
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+
+  /* 隐藏侧边栏 */
+  .sidebar-nav {
+    display: none;
+  }
+}
+
+/* 手机 */
+@media (max-width: 480px) {
+  .slide-title {
+    font-size: 30px;
+  }
+
+  .slide-subtitle {
+    font-size: 16px;
+  }
+
+  .main-content-area {
+    padding-top: 230px;
+    /* 调整空间 */
+  }
+
+  /* 【V2】卡片加大(手机) */
+  .content-card {
+    flex-basis: 170px;
+  }
+
+  /* 原 150px */
+  .content-card.mv-card {
+    flex-basis: 280px;
+  }
+
+  /* 原 240px */
+
+  .card-title {
+    font-size: 14px;
+  }
+
+  .card-artist {
+    font-size: 12px;
+  }
+
+  /* 隐藏内容轮播的 PC 按钮 */
+  .content-carousel-container .carousel-btn {
+    display: none;
+  }
+
+  /* 在手机上，让内容轮播可以原生滚动 */
+  .content-carousel {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .content-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
