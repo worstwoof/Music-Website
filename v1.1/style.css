@@ -1,0 +1,930 @@
+/*
+ * style.css
+ * 音乐播放器首页样式表
+ */
+
+/* 1. 全局设置与 CSS 变量
+------------------------------------------------- */
+
+:root {
+  /* 字体栈 */
+  --font-main: 'Helvetica Neue', Helvetica, Arial, 'Microsoft Yahei', 'Hiragino Sans GB', 'Heiti SC', 'WenQuanYi Micro Hei', sans-serif;
+
+  /* 基础尺寸 */
+  --base-font-size: 16px;
+  --header-height: 4.5rem;
+  /* 72px */
+  --border-radius: 0.5rem;
+  /* 8px */
+
+  /* ----- 暗色系 (默认) ----- */
+  /* 规范: bg=背景, text=文本, color=强调/行动 */
+  --bg-primary: #011230;
+  /* 深空蓝 (主背景) */
+  --bg-secondary: #1B305D;
+  /* 深海蓝 (容器/卡片) */
+  --bg-accent-1: #423B63;
+  /* 暮色紫 (点缀) */
+  --bg-accent-2: #AF7DAC;
+  /* 薰衣草 (次级点缀) */
+  --text-primary: #F5DADF;
+  /* 樱花粉 (主文本/高亮) */
+  --text-secondary: #AF7DAC;
+  /* 薰衣草 (次要文本/图标) */
+  --color-action: #F2926E;
+  /* 珊瑚橙 (行动色/按钮) */
+  --color-action-hover: #f0815a;
+  --color-border: #423B63;
+  /* 边框色 */
+
+  /* ----- 浅色系 (light-mode) ----- */
+  /* 我们需要定义一套对应的浅色变量 */
+  --bg-primary-light: #F4F7FA;
+  --bg-secondary-light: #FFFFFF;
+  --bg-accent-1-light: #E0E8F0;
+  --bg-accent-2-light: #B0C4DE;
+  --text-primary-light: #011230;
+  /* 深空蓝 (主文本) */
+  --text-secondary-light: #423B63;
+  /* 暮色紫 (次要文本) */
+  --color-action-light: #E57351;
+  /* 珊瑚橙 (稍暗) */
+  --color-action-hover-light: #d96340;
+  --color-border-light: #E0E8F0;
+}
+
+/* 浅色模式切换 */
+body.light-mode {
+  --bg-primary: var(--bg-primary-light);
+  --bg-secondary: var(--bg-secondary-light);
+  --bg-accent-1: var(--bg-accent-1-light);
+  --bg-accent-2: var(--bg-accent-2-light);
+  --text-primary: var(--text-primary-light);
+  --text-secondary: var(--text-secondary-light);
+  --color-action: var(--color-action-light);
+  --color-action-hover: var(--color-action-hover-light);
+  --color-border: var(--color-border-light);
+}
+
+/* 基础重置与全局样式 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--base-font-size);
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-action);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+ul {
+  list-style: none;
+}
+
+input,
+button {
+  font-family: inherit;
+  font-size: 1rem;
+  color: inherit;
+  border: none;
+  border-radius: var(--border-radius);
+}
+
+button {
+  cursor: pointer;
+}
+
+/* 容器 */
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* 通用按钮样式 */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  font-weight: bold;
+  border-radius: 50px;
+  /* 胶囊按钮 */
+  text-align: center;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-login {
+  background-color: var(--color-action);
+  color: var(--bg-primary);
+}
+
+body.light-mode .btn-login {
+  color: #fff;
+}
+
+.btn-login:hover {
+  background-color: var(--color-action-hover);
+  color: var(--bg-primary);
+  transform: translateY(-2px);
+}
+
+body.light-mode .btn-login:hover {
+  color: #fff;
+}
+
+/* 2. 顶部导航栏 (<header>)
+------------------------------------------------- */
+.site-header {
+  width: 100%;
+  height: var(--header-height);
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--color-border);
+  /* 粘性导航 */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar {
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-right: 2rem;
+}
+
+.logo:hover {
+  color: var(--text-primary);
+}
+
+.main-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.main-nav a {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.main-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: var(--color-action);
+  transition: width 0.3s ease;
+}
+
+.main-nav li.active a,
+.main-nav a:hover {
+  color: var(--text-primary);
+}
+
+.main-nav li.active a::after,
+.main-nav a:hover::after {
+  width: 100%;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* 搜索框 */
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+  /* 允许点击穿透到 input */
+}
+
+#searchInput {
+  background-color: var(--bg-secondary);
+  border: 1px solid transparent;
+  padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+  /* 左侧留出图标位置 */
+  border-radius: 50px;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  width: 180px;
+}
+
+#searchInput::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+/* 交互: 搜索框 获得焦点 */
+#searchInput:focus,
+.search-bar.focused #searchInput {
+  /* JS 会添加 focused 类 */
+  background-color: var(--bg-primary);
+  border-color: var(--color-action);
+  color: var(--text-primary);
+  outline: none;
+  width: 240px;
+  /* 焦点时展开 */
+}
+
+#searchInput:focus+.search-icon,
+.search-bar.focused .search-icon {
+  color: var(--color-action);
+}
+
+/* 主题切换按钮 */
+#theme-toggle {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+#theme-toggle:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+
+/* 默认显示月亮 (暗色模式) */
+#theme-toggle .sun-icon {
+  display: none;
+}
+
+#theme-toggle .moon-icon {
+  display: block;
+}
+
+/* 浅色模式下显示太阳 */
+body.light-mode #theme-toggle .sun-icon {
+  display: block;
+}
+
+body.light-mode #theme-toggle .moon-icon {
+  display: none;
+}
+
+/* 汉堡菜单 (默认隐藏) */
+.mobile-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 1002;
+}
+
+/* 3. 登录页面 (login.html)
+------------------------------------------------- */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--bg-secondary);
+  padding: 2.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.login-title {
+  text-align: center;
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--color-border);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--color-action);
+}
+
+.btn-login-submit {
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 1.1rem;
+  background-color: var(--color-action);
+  color: var(--bg-primary);
+  /* 确保文本可读 */
+  border: none;
+}
+
+body.light-mode .btn-login-submit {
+  color: #fff;
+}
+
+.btn-login-submit:hover {
+  background-color: var(--color-action-hover);
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.login-footer a {
+  color: var(--color-action);
+  font-weight: 500;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
+/* 4. 页面主体 (<main>)
+------------------------------------------------- */
+main {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+/* 通用分区标题 */
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--bg-accent-1);
+  display: inline-block;
+}
+
+/* A. 顶部轮播图 */
+.banner-carousel {
+  position: relative;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto 2.5rem;
+  overflow: hidden;
+  border-radius: var(--border-radius);
+  background-color: var(--bg-secondary);
+  /* 加载时背景 */
+}
+
+.carousel-container {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  flex-shrink: 0;
+}
+
+.carousel-slide img {
+  width: 100%;
+  object-fit: cover;
+  aspect-ratio: 1000 / 300;
+  /* 保持比例 */
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(1, 18, 48, 0.5);
+  /* --bg-primary 50% */
+  color: var(--text-primary);
+  border: none;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  opacity: 0;
+  /* 默认隐藏 */
+  transition: opacity 0.3s ease, background-color 0.3s ease;
+  z-index: 10;
+}
+
+.banner-carousel:hover .carousel-btn {
+  opacity: 1;
+  /* 悬停时显示 */
+}
+
+.carousel-btn:hover {
+  background-color: rgba(242, 146, 110, 0.8);
+  /* --color-action 80% */
+}
+
+.carousel-btn.prev {
+  left: 1rem;
+}
+
+.carousel-btn.next {
+  right: 1rem;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dot.active {
+  background-color: var(--color-action);
+}
+
+/* B/C. 推荐 (猜你喜欢 / 新歌发行) */
+.music-grid {
+  display: grid;
+  /* 响应式网格: 自动填充, 卡片最小 160px, 最大 1fr。在 1300px 容器下约 6-7 列 */
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.5rem;
+}
+
+.music-card {
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+/* 交互: 卡片悬停 */
+.music-card:hover {
+  transform: translateY(-5px) scale(1.03);
+  /* 放大效果 */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  /* 保持方形 */
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3rem;
+  height: 3rem;
+  color: var(--color-action);
+  background-color: rgba(1, 18, 48, 0.7);
+  /* --bg-primary 70% */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  /* 默认隐藏 */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  /* 允许点击穿透 */
+}
+
+.play-icon svg {
+  width: 60%;
+  height: 60%;
+}
+
+/* 交互: 悬停时显示播放按钮 */
+.music-card:hover .play-icon {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.card-content {
+  padding: 1rem;
+}
+
+.song-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  /* 文本溢出处理 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.25rem;
+}
+
+.artist-name {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* D. 排行榜 */
+.charts-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.chart-column {
+  background-color: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  border-top: 4px solid var(--bg-accent-1);
+}
+
+.chart-column:nth-child(1) {
+  border-color: var(--color-action);
+}
+
+.chart-column:nth-child(2) {
+  border-color: var(--bg-accent-2);
+}
+
+.chart-column:nth-child(3) {
+  border-color: #3f88c5;
+}
+
+/* 补充颜色 */
+.chart-column:nth-child(4) {
+  border-color: #6a994e;
+}
+
+/* 补充颜色 */
+
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.chart-list {
+  list-style: none;
+  counter-reset: chart-counter;
+}
+
+.chart-list li {
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--bg-primary);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  transition: background-color 0.2s ease;
+}
+
+.chart-list li:last-child {
+  border-bottom: none;
+}
+
+.chart-list li:hover {
+  background-color: var(--bg-accent-1);
+  color: var(--text-primary);
+}
+
+.chart-list li span {
+  font-weight: bold;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-right: 0.75rem;
+  width: 1.5rem;
+  /* 保持对齐 */
+}
+
+/* 前三名高亮 */
+.chart-list li:nth-child(1) span,
+.chart-list li:nth-child(2) span,
+.chart-list li:nth-child(3) span {
+  color: var(--color-action);
+}
+
+/* E. 推荐 MV */
+.mv-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.mv-card {
+  display: block;
+  /* 卡片本身是链接 */
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mv-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.mv-image {
+  aspect-ratio: 16 / 9;
+  /* 16:9 比例 */
+}
+
+.mv-card .card-content {
+  padding-top: 0.5rem;
+}
+
+/* MV卡片悬停时，播放按钮和文字都高亮 */
+.mv-card:hover .play-icon {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.mv-card:hover .song-title {
+  color: var(--color-action);
+}
+
+
+/* 5. 页脚 (<footer>)
+------------------------------------------------- */
+footer.site-footer {
+  background-color: var(--bg-primary);
+  border-top: 1px solid var(--color-border);
+  padding: 2rem 0;
+  color: var(--text-secondary);
+  margin-top: 2rem;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  /* 移动端换行 */
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  font-size: 0.9rem;
+}
+
+.copyright {
+  font-size: 0.85rem;
+}
+
+
+/* 6. 响应式设计 (Responsive Design)
+------------------------------------------------- */
+
+/* 平板 (approx. 769px - 1024px) */
+@media (max-width: 1024px) {
+  html {
+    font-size: 15px;
+    /* 稍稍缩小 */
+  }
+
+  .charts-container {
+    grid-template-columns: repeat(2, 1fr);
+    /* 排行榜 4 -> 2 */
+  }
+
+  .mv-grid {
+    grid-template-columns: repeat(2, 1fr);
+    /* MV 3 -> 2 */
+  }
+}
+
+/* 小型平板与大型手机 (approx. 481px - 768px) */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 4rem;
+    /* 64px */
+  }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  /* 汉堡菜单 激活 */
+  .mobile-nav-toggle {
+    display: block;
+  }
+
+  /* 隐藏 PC 导航和搜索框 */
+  .main-nav,
+  .nav-right .search-bar,
+  .nav-right .btn-login {
+    display: none;
+  }
+
+  /* 激活状态的移动端导航 */
+  .main-nav.mobile-active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+
+    position: fixed;
+    top: var(--header-height);
+    /* 导航栏下方 */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    padding: 2rem;
+
+    background-color: var(--bg-primary);
+    z-index: 1001;
+
+    /* 简单动画 */
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .main-nav.mobile-active.open {
+    transform: translateX(0);
+  }
+
+  /* 阻止 body 滚动当菜单打开时 */
+  body.nav-open {
+    overflow: hidden;
+  }
+
+  .main-nav.mobile-active a {
+    font-size: 1.5rem;
+  }
+
+  /* 调整网格 */
+  .music-grid {
+    /* 最小 140px, 约 3-4 列 */
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .charts-container {
+    grid-template-columns: 1fr;
+    /* 排行榜 2 -> 1 */
+    gap: 1.5rem;
+  }
+
+  .mv-grid {
+    grid-template-columns: 1fr;
+    /* MV 2 -> 1 */
+  }
+
+  .carousel-btn {
+    /* 移动端按钮调小一点 */
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.2rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* 手机 (<= 480px) */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  #searchInput:focus {
+    width: 150px;
+    /* 搜索框不要占满 */
+  }
+
+  .music-grid {
+    /* 最小 120px, 约 2 列 */
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+  }
+
+  .card-content {
+    padding: 0.75rem;
+  }
+
+  .song-title {
+    font-size: 0.95rem;
+  }
+
+  .artist-name {
+    font-size: 0.8rem;
+  }
+
+  .footer-content {
+    gap: 1.5rem;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    /* 页脚链接垂直排列 */
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .login-container {
+    padding: 1.5rem;
+  }
+}

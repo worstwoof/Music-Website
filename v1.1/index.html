@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Player - 发现音乐</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <nav class="navbar container">
+      <div class="nav-left">
+        <a href="index.html" class="logo">Music</a>
+        <ul class="main-nav">
+          <li class="active"><a href="index.html">发现音乐</a></li>
+          <li><a href="#">我的音乐</a></li>
+          <li><a href="#">MV</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-right">
+        <div class="search-bar">
+          <span class="search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path
+                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+            </svg>
+          </span>
+          <input type="text" id="searchInput" placeholder="搜索音乐、歌手...">
+        </div>
+
+        <a href="login.html" class="btn btn-login">登录</a>
+
+        <button id="theme-toggle" title="切换主题">
+          <span class="sun-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path
+                d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 0 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm9.193-.707a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
+            </svg>
+          </span>
+          <span class="moon-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path
+                d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278zM4.858 1.311A7.269 7.269 0 0 0 8.344 15C11.317 15 14 12.286 14 8.71c0-1.782-.84-3.37-2.135-4.43A.73.73 0 0 1 11.23 4.8a.787.787 0 0 1-.61.05A7.18 7.18 0 0 0 8.344 5.02C5.691 5.02 3.5 2.75 3.5 0c0-.58.08-1.13.22-1.65A.753.753 0 0 1 4.858 1.311z" />
+            </svg>
+          </span>
+        </button>
+      </div>
+
+      <button class="mobile-nav-toggle">
+        <span class="hamburger-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+              d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+          </svg>
+        </span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <section class="banner-carousel">
+      <div class="carousel-container">
+        <div class="carousel-slide">
+          <img src="https://via.placeholder.com/1000x300/F2926E/FFFFFF?text=Slide+1" alt="Banner 1">
+        </div>
+        <div class="carousel-slide">
+          <img src="https://via.placeholder.com/1000x300/AF7DAC/FFFFFF?text=Slide+2" alt="Banner 2">
+        </div>
+        <div class="carousel-slide">
+          <img src="https://via.placeholder.com/1000x300/1B305D/F5DADF?text=Slide+3" alt="Banner 3">
+        </div>
+      </div>
+      <button class="carousel-btn prev" aria-label="上一张">&lt;</button>
+      <button class="carousel-btn next" aria-label="下一张">&gt;</button>
+      <div class="carousel-dots"></div>
+    </section>
+
+    <section class="recommendations" id="featured">
+      <h2 class="section-title">猜你喜欢</h2>
+      <div class="music-grid">
+        <div class="music-card">
+          <div class="card-image">
+            <img src="https://via.placeholder.com/150x150/423B63/F5DADF?text=Song" alt="专辑封面">
+            <div class="play-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">歌曲名称</h3>
+            <p class="artist-name">歌手</p>
+          </div>
+        </div>
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/AF7DAC/011230?text=Song" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">梦的旋律</h3>
+            <p class="artist-name">艺术家B</p>
+          </div>
+        </div>
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/F2926E/011230?text=Song" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">城市微光</h3>
+            <p class="artist-name">歌手C</p>
+          </div>
+        </div>
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/F5DADF/1B305D?text=Song" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">樱花落</h3>
+            <p class="artist-name">Artist D</p>
+          </div>
+        </div>
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/1B305D/F5DADF?text=Song" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">深海蓝</h3>
+            <p class="artist-name">歌手E</p>
+          </div>
+        </div>
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/423B63/F5DADF?text=Song" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">暮色紫</h3>
+            <p class="artist-name">歌手F</p>
+          </div>
+        </div>
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/AF7DAC/011230?text=Song" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">薰衣草</h3>
+            <p class="artist-name">歌手G</p>
+          </div>
+        </div>
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/F2926E/011230?text=Song" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">珊瑚橙</h3>
+            <p class="artist-name">歌手H</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="recommendations" id="new-releases">
+      <h2 class="section-title">新歌发行</h2>
+      <div class="music-grid">
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/1B305D/F5DADF?text=New" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">午夜飞行</h3>
+            <p class="artist-name">新歌手A</p>
+          </div>
+        </div>
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/423B63/F5DADF?text=New" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">回音</h3>
+            <p class="artist-name">新歌手B</C< /p>
+          </div>
+        </div>
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/AF7DAC/011230?text=New" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">晨雾</h3>
+            <p class="artist-name">新歌手C</p>
+          </div>
+        </div>
+        <div class="music-card">
+          <div class="card-image"><img src="https://via.placeholder.com/150x150/F2926E/011230?text=New" alt="专辑封面">
+            <div class="play-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor"
+                viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg></div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">日落大道</h3>
+            <p class="artist-name">新歌手D</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="top-charts">
+      <h2 class="section-title">排行榜</h2>
+      <div class="charts-container">
+        <div class="chart-column">
+          <h3 class="chart-title">热歌榜</h3>
+          <ol class="chart-list">
+            <li><span>1.</span> 七里香 - 周杰伦</li>
+            <li><span>2.</span> 孤勇者 - 陈奕迅</li>
+            <li><span>3.</span> 富士山下 - 陈奕迅</li>
+            <li><span>4.</span> 晴天 - 周杰伦</li>
+            <li><span>5.</span> 夜曲 - 周杰伦</li>
+          </ol>
+        </div>
+        <div class="chart-column">
+          <h3 class="chart-title">新歌榜</h3>
+          <ol class="chart-list">
+            <li><span>1.</span> 午夜飞行 - 新歌手A</li>
+            <li><span>2.</span> 回音 - 新歌手B</li>
+            <li><span>3.</span> 晨雾 - 新歌手C</li>
+            <li><span>4.</span> 日落大道 - 新歌手D</li>
+            <li><span>5.</span> 新歌E - 佚名</li>
+          </ol>
+        </div>
+        <div class="chart-column">
+          <h3 class="chart-title">飙升榜</h3>
+          <ol class="chart-list">
+            <li><span>1.</span> 黑色毛衣 - 周杰伦</li>
+            <li><span>2.</span> 泡沫 - G.E.M.邓紫棋</li>
+            <li><span>3.</span> 关键词 - 林俊杰</li>
+            <li><span>4.</span> 漠河舞厅 - 柳爽</li>
+            <li><span>5.</span> 阿司匹林 - 痛仰乐队</li>
+          </ol>
+        </div>
+        <div class="chart-column">
+          <h3 class="chart-title">原创榜</h3>
+          <ol class="chart-list">
+            <li><span>1.</span> 原创A - 独立音乐人</li>
+            <li><span>2.</span> 原创B - 独立音乐人</li>
+            <li><span>3.</span> 原创C - 独立音乐人</li>
+            <li><span>4.</span> 原创D - 独立音乐人</li>
+            <li><span>5.</span> 原创E - 独立音乐人</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="mv-recommendations">
+      <h2 class="section-title">推荐 MV</h2>
+      <div class="mv-grid">
+        <a href="#" class="mv-card">
+          <div class="card-image mv-image">
+            <img src="https://via.placeholder.com/320x180/F2926E/011230?text=MV+16:9" alt="MV 封面">
+            <div class="play-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">《MV标题》</h3>
+            <p class="artist-name">艺术家</p>
+          </div>
+        </a>
+        <a href="#" class="mv-card">
+          <div class="card-image mv-image">
+            <img src="https://via.placeholder.com/320x180/423B63/F5DADF?text=MV+16:9" alt="MV 封面">
+            <div class="play-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">《另一个MV》</h3>
+            <p class="artist-name">歌手B</p>
+          </div>
+        </a>
+        <a href="#" class="mv-card">
+          <div class="card-image mv-image">
+            <img src="https://via.placeholder.com/320x180/AF7DAC/011230?text=MV+16:9" alt="MV 封面">
+            <div class="play-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                <path
+                  d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z" />
+              </svg>
+            </div>
+          </div>
+          <div class="card-content">
+            <h3 class="song-title">《史诗级制作》</h3>
+            <p class="artist-name">大牌乐队</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-links">
+        <a href="#">关于我们</a>
+        <a href="#">服务条款</a>
+        <a href="#">隐私政策</a>
+        <a href="#">帮助中心</a>
+      </div>
+      <p class="copyright">© 2025 Music Player. 版权所有。</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
