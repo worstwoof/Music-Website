@@ -4,14 +4,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- 1. 核心配置区 ---
     // ===============================================
     const songFolders = [
-        'paomo',   // 对应 songs/paomo/
-        'zaijian' , // 对应 songs/zaijian/
+        '泡沫',   // 对应 songs/paomo/
+        '再见' , // 对应 songs/zaijian/
         'love uu',
-        'xuxie',
-        'luoyeguigen',
-        'fushishanxia',
-        'nanjinglianaitonggao',
-        'aicuo'
+        '续写',
+        '落叶归根',
+        '富士山下',
+        '南京恋爱通告',
+        '爱错',
+        '我想要占据你',
+        '这就是爱'
     ];
 
     // ===============================================
