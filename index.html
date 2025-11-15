@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G.E.M. 邓紫棋 - 播放器</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+</head>
+<body>
+    <div id="snowflake-canvas"></div>
+    <div class="ambient-light one"></div>
+    <div class="ambient-light two"></div>
+    <div class="shooting-stars-container"></div> <div class="noise-overlay"></div> <header class="top-nav">
+        <nav class="nav-capsule">
+            <div class="nav-pill"></div>
+            <ul>
+                <li><a href="#">发现音乐</a></li>
+                <li><a href="#">播客</a></li>
+                <li><a href="#" class="active">我的</a></li> 
+                <li><a href="#">关注</a></li>
+            </ul>
+        </nav>
+        <div class="user-profile">
+            <img src="favicon.jpg" alt="User Avatar"> 
+        </div>
+    </header>
+
+    <main class="music-player">
+        
+        <div class="card-particle-overlay"></div>
+
+        <video id="mv-player" loop muted playsinline></video>
+
+        <section class="song-info">
+            <div class="vinyl-wrapper">
+                <div class="vinyl-record">
+                    <img src="img.jpg" alt="Album Art" class="album-art"> 
+                </div>
+                <div class="vinyl-sheen"></div>
+            </div>
+
+            <h1>泡沫 <span class="tag-quality">Hi-Res</span></h1>
+            
+            <p class="artist">G.E.M.邓紫棋</p>
+            <p class="album-title"></p>
+        </section>
+
+        <section class="lyrics-container">
+            <ul class="lyrics-list">
+
+            </ul>
+        </section>
+
+        <footer class="controls">
+            
+            <div class="music-visualizer">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            </div>
+
+            <div class="time-control">
+                <span class="time-current">0:00</span>
+                <div class="progress-bar-container">
+                    <div class="progress-bar"></div>
+                </div>
+                <span class="time-total">0:00</span>
+            </div>
+
+            <div class="button-controls">
+                <div class="left-buttons">
+                    <button class="btn" id="btn-repeat">
+                        <img src="icon/24gl-repeat2.png" alt="Repeat">
+                    </button>
+                    <button class="btn" id="btn-favorite">
+                        <img src="icon/24gl-heart.png" alt="Favorite">
+                    </button>
+                    <button class="btn" id="btn-mv">
+                        <img src="icon/24gl-mv.png" alt="MV" id="mv-icon">
+                    </button>
+                </div>
+
+                <div class="center-buttons">
+                    <button class="btn btn-large" id="btn-prev">
+                        <img src="icon/24gl-previous.png" alt="Previous">
+                    </button>
+                    <button class="btn btn-play" id="play-pause">
+                        <img src="icon/24gl-play.png" alt="Play" id="play-pause-icon"> 
+                    </button>
+                    <button class="btn btn-large" id="btn-next">
+                        <img src="icon/24gl-next.png" alt="Next">
+                    </button>
+                </div>
+                
+                <div class="right-buttons">
+                    <button class="btn" id="btn-volume">
+                        <img src="icon/24gl-volumeHigh.png" alt="Volume" id="volume-icon">
+                    </button>
+                    <div class="volume-control-container">
+                        <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="100">
+                    </div>
+                    <button class="btn" id="btn-playlist">
+                        <img src="icon/24gl-playlistMusic4.png" alt="Playlist">
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <div class="playlist-modal" id="playlist-modal">
+        <div class="modal-header">
+            <h3>播放列表</h3>
+            <button class="btn btn-close" id="btn-close-modal">&times;</button>
+        </div>
+        <ul class="playlist-song-list" id="playlist-song-list"></ul>
+    </div>
+
+    <audio id="audio-player" src="G.E.M.邓紫棋-泡沫.flac" crossorigin="anonymous"></audio>
+    <script src="script.js"></script>
+</body>
+</html>
