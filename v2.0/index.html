@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐世界 | 我的音乐</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 流星容器 -->
+    <div class="shooting-stars-container"></div>
+    
+    <!-- 雪花画布 -->
+    <div id="snowflake-canvas"></div>
+
+    <!-- 与首页完全一致的导航栏 -->
+    <header class="header" id="header">
+        <div class="header-container">
+            <div class="logo"><i class="fas fa-music"></i> 音乐世界</div>
+
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="搜索音乐、歌手..." />
+                <span class="search-icon"><i class="fas fa-search"></i></span>
+            </div>
+
+            <nav class="nav-options">
+                <a href="index.html" class="nav-item">
+                    <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-music"></i> 我的音乐
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-compass"></i> 发现
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-magic"></i> 新歌
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-trophy"></i> 排行榜
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-video"></i> MV
+                </a>
+                <div class="nav-pill"></div>
+            </nav>
+
+            <div class="nav-controls">
+                <button class="login-register">登录/注册</button>
+                <button class="theme-toggle" title="切换主题">
+                    <i class="fas fa-sun sun-icon"></i>
+                    <i class="fas fa-moon moon-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 我的音乐界面 -->
+    <section id="mymusic" class="my-music-section">
+        <div class="container">
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <div class="profile">
+                    <img src="https://th.bing.com/th/id/OIP.oFazgA0xj09WmTqa4k3nRAAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3" alt="用户头像" class="profile-img">
+                    <h2>DOGE</h2>
+                    <p>音乐爱好者</p>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">128</div>
+                        <div class="stat-label">收藏</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">关注</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1,256</div>
+                        <div class="stat-label">粉丝</div>
+                    </div>
+                </div>
+                
+                <ul class="nav-menu">
+                    <li class="nav-item-music active"><i class="fas fa-heart"></i> 我的收藏</li>
+                    <li class="nav-item-music"><i class="fas fa-history"></i> 最近播放</li>
+                    <li class="nav-item-music"><i class="fas fa-download"></i> 本地音乐</li>
+                    <li class="nav-item-music"><i class="fas fa-user-edit"></i> 编辑资料</li>
+                </ul>
+            </div>
+            
+            <!-- 主内容区 -->
+            <div class="main-content">
+                <!-- 我的收藏 -->
+                <div class="content-section active" id="favorites">
+                    <div class="header-music">
+                        <h1>我的收藏</h1>
+                        <div class="search-bar-music">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="搜索音乐、歌手、专辑...">
+                        </div>
+                    </div>
+                    
+                    <div class="music-grid">
+                        <div class="music-card">
+                            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80" alt="专辑封面" class="album-cover">
+                            <div class="music-info">
+                                <div class="music-title">再见</div>
+                                <div class="music-artist">G.E.M. 邓紫棋</div>
+                            </div>
+                        </div>
+                        
+                        <div class="music-card">
+                            <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&q=80" alt="专辑封面" class="album-cover">
+                            <div class="music-info">
+                                <div class="music-title">Love U U</div>
+                                <div class="music-artist">林俊杰</div>
+                            </div>
+                        </div>
+                        
+                        <div class="music-card">
+                            <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&q=80" alt="专辑封面" class="album-cover">
+                            <div class="music-info">
+                                <div class="music-title">续写</div>
+                                <div class="music-artist">单依纯</div>
+                            </div>
+                        </div>
+                        
+                        <div class="music-card">
+                            <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&q=80" alt="专辑封面" class="album-cover">
+                            <div class="music-info">
+                                <div class="music-title">落叶归根</div>
+                                <div class="music-artist">王力宏</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 最近播放 -->
+                <div class="content-section" id="recent">
+                    <div class="header-music">
+                        <h1>最近播放</h1>
+                        <div class="search-bar-music">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="搜索音乐、歌手、专辑...">
+                        </div>
+                    </div>
+                    
+                    <div class="playlist">
+                        <div class="playlist-header">
+                            <div>#</div>
+                            <div>歌曲标题</div>
+                            <div>歌手</div>
+                            <div>专辑</div>
+                            <div><i class="far fa-clock"></i></div>
+                        </div>
+                        
+                        <div class="playlist-item active">
+                            <div class="playlist-number">1</div>
+                            <div class="playlist-title">
+                                <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&q=80" alt="专辑封面">
+                                <div>富士山下</div>
+                            </div>
+                            <div>陈奕迅</div>
+                            <div>What's Going On...?</div>
+                            <div>4:55</div>
+                        </div>
+                        
+                        <div class="playlist-item">
+                            <div class="playlist-number">2</div>
+                            <div class="playlist-title">
+                                <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&q=80" alt="专辑封面">
+                                <div>南京恋爱通告</div>
+                            </div>
+                            <div>银河快递</div>
+                            <div>南京恋爱通告</div>
+                            <div>3:48</div>
+                        </div>
+                        
+                        <div class="playlist-item">
+                            <div class="playlist-number">3</div>
+                            <div class="playlist-title">
+                                <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=500&q=80" alt="专辑封面">
+                                <div>爱错</div>
+                            </div>
+                            <div>王力宏</div>
+                            <div>盖世英雄</div>
+                            <div>4:18</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 本地音乐 -->
+                <div class="content-section" id="local">
+                    <div class="header-music">
+                        <h1>本地音乐</h1>
+                        <div class="search-bar-music">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="搜索音乐、歌手、专辑...">
+                        </div>
+                    </div>
+                    
+                    <div class="local-music-container">
+                        <div class="section-title-music">
+                            <h2>周杰伦</h2>
+                        </div>
+                        
+                        <div class="music-grid">
+                            <div class="music-card">
+                                <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80" alt="专辑封面" class="album-cover">
+                                <div class="music-info">
+                                    <div class="music-title">七里香</div>
+                                    <div class="music-artist">周杰伦</div>
+                                </div>
+                            </div>
+                            
+                            <div class="music-card">
+                                <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&q=80" alt="专辑封面" class="album-cover">
+                                <div class="music-info">
+                                    <div class="music-title">晴天</div>
+                                    <div class="music-artist">周杰伦</div>
+                                </div>
+                            </div>
+                            
+                            <div class="music-card">
+                                <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&q=80" alt="专辑封面" class="album-cover">
+                                <div class="music-info">
+                                    <div class="music-title">稻香</div>
+                                    <div class="music-artist">周杰伦</div>
+                                </div>
+                            </div>
+                            
+                            <div class="music-card">
+                                <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&q=80" alt="专辑封面" class="album-cover">
+                                <div class="music-info">
+                                    <div class="music-title">青花瓷</div>
+                                    <div class="music-artist">周杰伦</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="section-title-music">
+                            <h2>林俊杰</h2>
+                        </div>
+                        
+                        <div class="music-grid">
+                            <div class="music-card">
+                                <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80" alt="专辑封面" class="album-cover">
+                                <div class="music-info">
+                                    <div class="music-title">江南</div>
+                                    <div class="music-artist">林俊杰</div>
+                                </div>
+                            </div>
+                            
+                            <div class="music-card">
+                                <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&q=80" alt="专辑封面" class="album-cover">
+                                <div class="music-info">
+                                    <div class="music-title">曹操</div>
+                                    <div class="music-artist">林俊杰</div>
+                                </div>
+                            </div>
+                            
+                            <div class="music-card">
+                                <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&q=80" alt="专辑封面" class="album-cover">
+                                <div class="music-info">
+                                    <div class="music-title">美人鱼</div>
+                                    <div class="music-artist">林俊杰</div>
+                                </div>
+                            </div>
+                            
+                            <div class="music-card">
+                                <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&q=80" alt="专辑封面" class="album-cover">
+                                <div class="music-info">
+                                    <div class="music-title">修炼爱情</div>
+                                    <div class="music-artist">林俊杰</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 编辑资料 -->
+                <div class="content-section" id="edit-profile">
+                    <div class="header-music">
+                        <h1>编辑资料</h1>
+                    </div>
+                    
+                    <div class="edit-profile-content">
+                        <div class="profile-preview">
+                            <img src="https://th.bing.com/th/id/OIP.oFazgA0xj09WmTqa4k3nRAAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3" alt="用户头像" class="preview-avatar">
+                            <h3>DOGE</h3>
+                            <p class="preview-bio">音乐爱好者</p>
+                        </div>
+                        
+                        <div class="edit-form">
+                            <div class="form-group-edit">
+                                <label class="form-label" for="editUsername">用户名</label>
+                                <input type="text" id="editUsername" class="form-input" placeholder="请输入用户名" value="DOGE">
+                            </div>
+                            
+                            <div class="form-group-edit">
+                                <label class="form-label" for="editBio">个人简介</label>
+                                <textarea id="editBio" class="form-textarea" placeholder="介绍一下你自己..." rows="4">音乐爱好者</textarea>
+                            </div>
+                            
+                            <div class="form-group-edit">
+                                <label class="form-label">选择头像</label>
+                                <div class="avatar-grid-edit">
+                                    <img src="https://th.bing.com/th/id/OIP.oFazgA0xj09WmTqa4k3nRAAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3" alt="头像1" class="avatar-option-edit">
+                                    <img src="https://tse4-mm.cn.bing.net/th/id/OIP-C.J7vqZPUdkyQkLxrF-4WybwAAAA?w=204&h=204&c=7&r=0&o=7&cb=ucfimg2&dpr=1.5&pid=1.7&rm=3&ucfimg=1" alt="头像2" class="avatar-option-edit">
+                                    <img src="https://tse2-mm.cn.bing.net/th/id/OIP-C.oEywjsiW7dW95xq4301aQwAAAA?w=200&h=200&c=7&r=0&o=7&cb=ucfimg2&dpr=1.5&pid=1.7&rm=3&ucfimg=1" alt="头像3" class="avatar-option-edit">
+                                    <img src="https://tse1-mm.cn.bing.net/th/id/OIP-C.Knh5i_ceDHm_cwzEcKFJ2gAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimg2&dpr=1.5&pid=1.7&rm=3&ucfimg=1" alt="头像4" class="avatar-option-edit">
+                                </div>
+                            </div>
+                            
+                            <button class="save-profile-btn" id="saveProfileInPage">保存资料</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 播放器控件 -->
+    <div class="player-controls">
+        <div class="now-playing">
+            <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&q=80" alt="当前播放">
+            <div class="track-info">
+                <h4>富士山下</h4>
+                <p>陈奕迅</p>
+            </div>
+            <i class="far fa-heart"></i>
+        </div>
+        
+        <div class="player-center">
+            <div class="control-buttons">
+                <i class="fas fa-random"></i>
+                <i class="fas fa-step-backward"></i>
+                <i class="fas fa-play-circle play-pause"></i>
+                <i class="fas fa-step-forward"></i>
+                <i class="fas fa-redo"></i>
+            </div>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <div class="time">
+                <span>1:25</span>
+                <span>4:55</span>
+            </div>
+        </div>
+        
+        <div class="player-right">
+            <i class="fas fa-list"></i>
+            <i class="fas fa-volume-up"></i>
+            <div class="volume-bar">
+                <div class="volume-level"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 登录弹窗 -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">登录音乐世界</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">用户名或邮箱</label>
+                    <input type="text" id="username" class="form-input" placeholder="请输入用户名或邮箱" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <input type="password" id="password" class="form-input" placeholder="请输入密码" required />
+                </div>
+                <button type="submit" class="save-btn">登录</button>
+            </form>
+            <div class="modal-footer">
+                <p>还没有账号？<a href="#">立即注册</a></p>
+                <p><a href="#">忘记密码？</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
