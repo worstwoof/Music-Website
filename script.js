@@ -1,11 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
     // ===============================================
-    // --- 1. 核心配置区 (已修改) ---
+    // --- 1. 核心配置区 ---
     // ===============================================
-    
-    // (已删除) const songFolders = [...] 数组已被移除。
-    // 我们将从 build-playlist.js 生成的 playlist.json 文件中加载它。
+    // (保持不变, 我们将从 playlist.json 加载)
 
     // ===============================================
     // --- 2. 全局变量与元素获取 ---
@@ -13,7 +11,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let playlistData = []; 
     let currentSongId = 0;
     
-    // ... (其他全局变量保持不变) ...
     let isPlaying = false; 
     let isSeeking = false; 
     let isUserScrolling = false;
@@ -22,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let playMode = 'loop';
     let lyricsData = []; 
     let currentLyricDataIndex = -1; 
-    let draggedItemId = null; // (新增) 用于拖拽排序
+    let draggedItemId = null; 
 
     // ... (DOM 元素获取保持不变) ...
     const audio = document.getElementById('audio-player');
@@ -63,6 +60,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     let isMvMode = false;
     const colorThief = new ColorThief();
 
+    // === (新增) 1. 加载已保存的音量 ===
+    const savedVolume = localStorage.getItem('playerVolume');
+    if (savedVolume !== null) {
+        const volumeValue = parseFloat(savedVolume);
+        // 应用到两个播放器
+        audio.volume = volumeValue;
+        mvPlayer.volume = volumeValue;
+        audio.muted = (volumeValue === 0);
+        lastVolume = volumeValue > 0 ? volumeValue : 1;
+        // (UI 将在 audio.onloadedmetadata 中被更新)
+    }
+
     // ===============================================
     // --- 3. 自动加载系统 (已修改) ---
     // ===============================================
@@ -70,13 +79,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadAllSongs() {
         console.log("开始加载歌曲...");
         
-        // (新增) 步骤 1: 加载 `playlist.json`
+        // 1. 加载 `playlist.json`
         let songFolders = [];
         try {
-            const response = await fetch('playlist.json'); //?t=' + new Date().getTime());
-            if (!response.ok) {
-                throw new Error('playlist.json 加载失败。您是否运行了 `node build-playlist.js` ?');
-            }
+            const response = await fetch('playlist.json');
+            if (!response.ok) throw new Error('playlist.json 加载失败。');
             songFolders = await response.json();
         } catch (e) {
             console.error(e);
@@ -85,25 +92,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // (不变) 步骤 2: 遍历 `songFolders` 数组 (现在是动态的了)
+        // 2. 遍历 `songFolders` 加载歌曲详情
         playlistData = []; 
         for (let i = 0; i < songFolders.length; i++) {
             const folder = songFolders[i];
             const basePath = `songs/${folder}/`;
-
             try {
                 const response = await fetch(`${basePath}info.json`);
                 if (!response.ok) throw new Error(`配置缺失: ${folder}`);
                 const info = await response.json();
-
                 let lrcText = "";
                 try {
                     const lrcRes = await fetch(`${basePath}lyrics.lrc`);
                     if (lrcRes.ok) lrcText = await lrcRes.text();
-                } catch (e) { console.warn("歌词加载失败", e); }
+                } catch (e) { /* 忽略歌词加载失败 */ }
 
                 playlistData.push({
-                    id: i, // (注意) id 仍然基于它在数组中的初始索引
+                    id: i, // (重要) ID 必须是固定的
                     title: info.title,
                     artist: info.artist,
                     album: info.album || "", 
@@ -112,26 +117,51 @@ document.addEventListener('DOMContentLoaded', async () => {
                     lrc: lrcText,
                     mv: info.mv ? `${basePath}${info.mv}` : null
                 });
-
             } catch (error) {
                 console.error(`加载失败 [${folder}]:`, error);
+            }
+        }
+        
+        // === (新增) 3. 应用已保存的播放列表顺序 ===
+        const savedOrder = localStorage.getItem('playerPlaylistOrder');
+        if (savedOrder) {
+            try {
+                const orderedIds = JSON.parse(savedOrder);
+                // 创建一个查找表 (Map)，用于快速排序
+                const orderMap = new Map(orderedIds.map((id, index) => [id, index]));
+                
+                // 过滤掉已保存但 playlist.json 中已删除的歌曲
+                const newPlaylistData = playlistData.filter(song => orderMap.has(song.id));
+
+                // 根据保存的顺序排序
+                newPlaylistData.sort((a, b) => orderMap.get(a.id) - orderMap.get(b.id));
+
+                // 找出 `playlist.json` 中新增的歌曲 (不在 savedOrder 中)
+                const newSongs = playlistData.filter(song => !orderMap.has(song.id));
+                
+                // 组合：已排序的 + 新增的
+                playlistData = [...newPlaylistData, ...newSongs];
+                
+                console.log("成功加载并应用了已保存的播放列表顺序。");
+            } catch (e) {
+                console.warn("解析已保存的播放列表顺序失败。", e);
             }
         }
 
         console.log(`成功加载 ${playlistData.length} 首歌曲`);
         
+        // 4. 加载第一首歌
         if (playlistData.length > 0) {
-            loadSongToPlayer(0, false); 
-            renderPlaylist(); // 渲染播放列表
+            loadSongToPlayer(playlistData[0].id, false); 
+            renderPlaylist();
         }
     }
 
     // ===============================================
     // --- 4. 核心播放逻辑 ---
     // ===============================================
-
     function loadSongToPlayer(id, autoPlay = true) {
-        // (修改) 确保我们通过 `id` 查找，而不是索引
+        // (修改) 确保我们通过 `id` 查找
         const song = playlistData.find(s => s.id === id);
         if (!song) {
             console.warn(`歌曲 ID ${id} 未在 playlistData 中找到。`);
@@ -140,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         currentSongId = song.id;
         audio.crossOrigin = "anonymous";
-
+        
         // ... (loadSongToPlayer 的其余部分保持不变) ...
         if (!isMvMode) {
              if (audio.src !== new URL(song.src, document.baseURI).href) {
@@ -178,7 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         renderLyrics(song.lrc);
-        renderPlaylist(); // (重要) 切换歌曲时重新渲染，以高亮正确的歌曲
+        renderPlaylist();
         if (autoPlay) {
             if (!isAudioContextSetup) setupAudioContext();
             if (isMvMode && song.mv) {
@@ -193,25 +223,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateFavoriteButtonUI(currentSongId);
     }
 
-    // ... (playNext, playPrev 保持不变) ...
-    // (注意：playNext/Prev 现在需要处理拖拽后的顺序)
     function playNext() {
-        // (修改) 逻辑更新为基于 `playlistData` 数组的当前顺序
+        // (保持不变, 此逻辑已支持排序后的列表)
         const currentIndex = playlistData.findIndex(s => s.id === currentSongId);
         let newIndex = (currentIndex + 1) % playlistData.length;
-        if (currentIndex === -1) newIndex = 0; // 容错
-
+        if (currentIndex === -1) newIndex = 0;
         const nextSong = playlistData[newIndex];
         loadSongToPlayer(nextSong.id, true);
     }
 
     function playPrev() {
-        // (修改) 逻辑更新为基于 `playlistData` 数组的当前顺序
+        // (保持不变, 此逻辑已支持排序后的列表)
         const currentIndex = playlistData.findIndex(s => s.id === currentSongId);
         let newIndex = currentIndex - 1;
         if (newIndex < 0) newIndex = playlistData.length - 1;
-        if (currentIndex === -1) newIndex = 0; // 容错
-
+        if (currentIndex === -1) newIndex = 0;
         const prevSong = playlistData[newIndex];
         loadSongToPlayer(prevSong.id, true);
     }
@@ -219,8 +245,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ===============================================
     // --- 4.5. 播放模式逻辑 ---
     // ===============================================
-
-    // ... (cyclePlayMode, updateRepeatButtonUI 保持不变) ...
+    
+    // ... (播放模式, 收藏功能 保持不变) ...
     function cyclePlayMode() {
         if (playMode === 'loop') playMode = 'one';
         else if (playMode === 'one') playMode = 'shuffle';
@@ -229,43 +255,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     function updateRepeatButtonUI() {
         switch(playMode) {
-            case 'one':
-                repeatIcon.src = 'icon/24gl-repeatOnce2.png'; break;
-            case 'shuffle':
-                repeatIcon.src = 'icon/24gl-shuffle.png'; break;
-            default:
-                repeatIcon.src = 'icon/24gl-repeat2.png'; break;
+            case 'one': repeatIcon.src = 'icon/24gl-repeatOnce2.png'; break;
+            case 'shuffle': repeatIcon.src = 'icon/24gl-shuffle.png'; break;
+            default: repeatIcon.src = 'icon/24gl-repeat2.png'; break;
         }
     }
-
     function playShuffle() {
-        // ... (随机播放逻辑保持不变) ...
-        if (playlistData.length <= 1) {
-            playNext(); 
-            return;
-        }
+        if (playlistData.length <= 1) { playNext(); return; }
         let newId;
-        do {
-            newId = playlistData[Math.floor(Math.random() * playlistData.length)].id;
-        } while (newId === currentSongId);
+        do { newId = playlistData[Math.floor(Math.random() * playlistData.length)].id; } 
+        while (newId === currentSongId);
         loadSongToPlayer(newId, true);
     }
-
     function handleSongEnd() {
-        // ... (handleSongEnd 逻辑保持不变) ...
         switch(playMode) {
             case 'one':
                 if (isMvMode) { mvPlayer.currentTime = 0; mvPlayer.play(); }
                 else { audio.currentTime = 0; audio.play(); }
                 break;
-            case 'shuffle':
-                playShuffle(); break;
-            default:
-                playNext(); break;
+            case 'shuffle': playShuffle(); break;
+            default: playNext(); break;
         }
     }
-    
-    // ... (handleNextClick, 收藏功能 保持不变) ...
     function handleNextClick() {
         if (playMode === 'shuffle') playShuffle();
         else playNext();
@@ -296,6 +307,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateFavoriteButtonUI(songId);
     }
     
+    // ===============================================
+    // --- 5. 视觉进阶：背景与黑胶光晕自适应 ---
+    // ===============================================
+    
     // ... (背景主题 保持不变) ...
     function updateBackgroundTheme(imgElement) {
         if (imgElement.complete) applyBackground(imgElement);
@@ -316,7 +331,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- 6. LRC 歌词解析与渲染 ---
     // ===============================================
     
-    // ... (parseLrc, renderLyrics, 3D歌词逻辑 保持不变) ...
+    // ... (歌词逻辑 保持不变) ...
     function parseLrc(lrcText) {
         if (!lrcText) return [];
         const lines = lrcText.split('\n');
@@ -332,7 +347,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         return result;
     }
-
     function renderLyrics(lrcString) {
         lyricsListElement.innerHTML = '';
         lyricsData = [];
@@ -368,7 +382,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         render3DLyrics(0);
     }
-
     function render3DLyrics(targetIndex) {
         if (!lyricsData.length) return;
         if (targetIndex < 0) targetIndex = 0;
@@ -388,8 +401,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             el.style.pointerEvents = opacity > 0 ? 'auto' : 'none';
         });
     }
-
-    // ... (时间更新, 歌词滚动 保持不变) ...
     audio.addEventListener('timeupdate', () => {
         if (isMvMode || isSeeking) return;
         updateUI(audio.currentTime);
@@ -450,7 +461,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- 7. 基础 UI 控制 ---
     // ===============================================
     
-    // ... (播放/暂停, 进度条, 保持不变) ...
+    // ... (播放/暂停, 进度条 保持不变) ...
     function updatePlayPauseIcon() {
         if (isPlaying) {
             playPauseIcon.src = 'icon/24gl-pause.png';
@@ -461,6 +472,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             vinylRecord.classList.remove('playing');
             visualizer.classList.remove('playing');
         }
+
+        // === (新增) 控制播放列表图标的动画 ===
+        const playingBars = document.querySelectorAll('.playing-bar');
+        if (playingBars.length) {
+            // 1. 获取当前的播放状态
+            const animationState = isPlaying ? 'running' : 'paused';
+            
+            // 2. 应用到所有 bar
+            playingBars.forEach(bar => {
+                bar.style.animationPlayState = animationState;
+            });
+        }
+        // ======================================
     }
     playPauseBtn.addEventListener('click', () => {
         if (isPlaying) {
@@ -512,99 +536,103 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // ===============================================
-    // --- 7.3. 播放列表与拖拽 (已修改) ---
+    // --- 7.3. 播放列表与拖拽 ---
     // ===============================================
 
-    /**
-     * (修改) 渲染播放列表
-     * (新增) 添加 `draggable` 属性和 D&D 事件监听
-     */
     function renderPlaylist() {
         songListUl.innerHTML = ''; 
         
-        // (修改) 遍历 `playlistData` 来保持顺序
         playlistData.forEach(song => {
             const li = document.createElement('li');
-            if (song.id === currentSongId) li.classList.add('playing');
-            li.innerHTML = `<span class="song-item-title">${song.title}</span><span class="song-item-artist">${song.artist}</span>`;
+            
+            let playingIndicator = ''; // (新增) 用于存放图标 HTML
+
+            if (song.id === currentSongId) {
+                li.classList.add('playing'); // (保持) 保留 .playing 类, 用于状态识别
+                
+                // (新增) 创建图标的 HTML
+                playingIndicator = `
+                    <div class="playing-icon-container">
+                        <span class="playing-bar"></span>
+                        <span class="playing-bar"></span>
+                        <span class="playing-bar"></span>
+                    </div>
+                `;
+            }
+
+            // (修改) 将图标 HTML 插入到 标题 后面，并用 div 包裹
+            li.innerHTML = `
+                <div class="song-title-wrapper">
+                    <span class="song-item-title">${song.title}</span>
+                    ${playingIndicator}
+                </div>
+                <span class="song-item-artist">${song.artist}</span>
+            `;
+
+            // (保持) 您所有的拖拽和点击事件监听器保持不变
             li.addEventListener('click', () => loadSongToPlayer(song.id, true));
-            
-            // === (新增) D&D 属性与事件 ===
             li.draggable = true;
-            li.dataset.songId = song.id; // 绑定歌曲 ID
-            
+            li.dataset.songId = song.id; 
             li.addEventListener('dragstart', handleDragStart);
             li.addEventListener('dragover', handleDragOver);
             li.addEventListener('dragleave', handleDragLeave);
             li.addEventListener('drop', handleDrop);
             li.addEventListener('dragend', handleDragEnd);
-            // ================================
 
             songListUl.appendChild(li);
         });
     }
 
-    // (新增) D&D 事件处理函数
     function handleDragStart(e) {
         draggedItemId = parseInt(e.currentTarget.dataset.songId);
         e.dataTransfer.effectAllowed = 'move';
         e.currentTarget.classList.add('dragging');
     }
-
     function handleDragOver(e) {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
         e.currentTarget.classList.add('drag-over');
     }
-
     function handleDragLeave(e) {
         e.currentTarget.classList.remove('drag-over');
     }
 
+    /**
+     * (修改) 拖拽释放
+     */
     function handleDrop(e) {
         e.preventDefault();
         e.currentTarget.classList.remove('drag-over');
-        
         const droppedOnId = parseInt(e.currentTarget.dataset.songId);
-        if (draggedItemId === droppedOnId) {
-            return; // 拖到了自己身上
-        }
+        if (draggedItemId === droppedOnId) return;
 
-        // 核心逻辑：重新排序 `playlistData` 数组
         const draggedIndex = playlistData.findIndex(s => s.id === draggedItemId);
         const targetIndex = playlistData.findIndex(s => s.id === droppedOnId);
-        
         if (draggedIndex === -1 || targetIndex === -1) return;
 
-        // 1. 从数组中移除被拖拽的项
         const [draggedItem] = playlistData.splice(draggedIndex, 1);
+        const newTargetIndex = playlistData.findIndex(s => s.id === droppedOnId); // 重新计算索引
         
-        // 2. 插入到新位置
-        // (需要重新计算目标索引，因为 splice 已经改变了数组)
-        const newTargetIndex = playlistData.findIndex(s => s.id === droppedOnId);
-        
-        if (draggedIndex < targetIndex) {
-             // 如果向下拖动，在目标项之后插入
-             playlistData.splice(newTargetIndex + 1, 0, draggedItem);
-        } else {
-             // 如果向上拖动，在目标项之前插入
-             playlistData.splice(newTargetIndex, 0, draggedItem);
-        }
+        if (draggedIndex < newTargetIndex) playlistData.splice(newTargetIndex + 1, 0, draggedItem);
+        else playlistData.splice(newTargetIndex, 0, draggedItem);
 
-        // 3. 重新渲染整个播放列表以反映新顺序
-        renderPlaylist();
+        // === (新增) 2. 保存新的播放列表顺序 ===
+        const newOrder = playlistData.map(song => song.id);
+        localStorage.setItem('playerPlaylistOrder', JSON.stringify(newOrder));
+        console.log("播放列表顺序已保存。");
+
+        renderPlaylist(); // 重新渲染
     }
 
     function handleDragEnd(e) {
         e.currentTarget.classList.remove('dragging');
         draggedItemId = null;
-        // 清理所有 drag-over 状态，以防万一
         document.querySelectorAll('.playlist-song-list li.drag-over').forEach(li => {
             li.classList.remove('drag-over');
         });
     }
     
-    // (修改) 播放列表按钮逻辑 (滚动逻辑保持不变)
+    // ... (播放列表弹窗逻辑 保持不变) ...
     playlistBtn.addEventListener('click', () => {
         playlistModal.classList.toggle('show');
         if (playlistModal.classList.contains('show')) {
@@ -620,10 +648,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     });
-    
     closeModalBtn.addEventListener('click', () => playlistModal.classList.remove('show'));
-    
-    // ... (事件监听 保持不变) ...
     prevBtn.addEventListener('click', playPrev);
     nextBtn.addEventListener('click', handleNextClick);
     audio.addEventListener('ended', handleSongEnd);
@@ -633,7 +658,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     audio.onloadedmetadata = () => {
         if (!isMvMode) totalTimeEl.textContent = formatTime(audio.duration);
-        updateVolumeUI();
+        // (修改) 确保在音频加载后，根据保存的音量更新UI
+        updateVolumeUI(); 
     };
     mvPlayer.onloadedmetadata = () => {
         if (isMvMode) totalTimeEl.textContent = formatTime(mvPlayer.duration);
@@ -648,30 +674,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // ===============================================
-    // --- 7.5. 音量控制 ---
+    // --- 7.5. 音量控制 (已修改) ---
     // ===============================================
-    
-    // ... (音量逻辑 保持不变) ...
+
+    /**
+     * (修改) 音量滑块改变
+     */
     function handleVolumeChange() {
         const value = volumeSlider.value / 100;
         audio.volume = value;
         mvPlayer.volume = value;
         audio.muted = (value === 0);
+
+        // === (新增) 3. 保存音量 ===
+        localStorage.setItem('playerVolume', value);
     }
+
     function toggleMute() {
+        let newVolume;
         if (audio.muted) {
+            newVolume = (lastVolume > 0) ? lastVolume : 1;
             audio.muted = false;
-            const newVol = (lastVolume > 0) ? lastVolume : 1;
-            audio.volume = newVol;
-            mvPlayer.volume = newVol;
+            audio.volume = newVolume;
+            mvPlayer.volume = newVolume;
         } else {
-            lastVolume = audio.volume;
+            lastVolume = audio.volume; // 保存当前音量
+            newVolume = 0;
             audio.muted = true;
-            audio.volume = 0;
-            mvPlayer.volume = 0;
+            audio.volume = newVolume;
+            mvPlayer.volume = newVolume;
         }
+        
+        // === (新增) 3. 保存音量 ===
+        // (静音时保存 0，取消静音时保存恢复的音量)
+        localStorage.setItem('playerVolume', newVolume);
     }
+
     function updateVolumeUI() {
+        // (保持不变, 此函数现在会自动读取启动时设置的音量)
         const volume = audio.muted ? 0 : audio.volume;
         if (!audio.muted && volume > 0) lastVolume = volume;
         volumeSlider.value = volume * 100;
@@ -681,6 +721,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         else if (volume < 0.66) volumeIcon.src = 'icon/24gl-volumeMiddle.png';
         else volumeIcon.src = 'icon/24gl-volumeHigh.png';
     }
+    
     volumeSlider.addEventListener('input', handleVolumeChange);
     volumeBtn.addEventListener('click', toggleMute);
     audio.addEventListener('volumechange', updateVolumeUI);
@@ -755,8 +796,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         requestAnimationFrame(renderVisualizer);
         if (!isPlaying) {
             visualizerBars.forEach(b => {
-                b.style.height = '5%';
-                b.style.opacity = 1;
+                b.style.height = '5%'; b.style.opacity = 1;
                 b.style.background = 'var(--progress-bar-bg)'; 
             });
             if(particleContainer) particleContainer.style.setProperty('--audio-pulse', 0);
@@ -816,7 +856,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // ... (流星, 粒子, 雪花 保持不变) ...
+    // ... (特效 保持不变) ...
     const starsContainer = document.querySelector('.shooting-stars-container');
     if(starsContainer) {
         for(let i=0; i<60; i++) {
@@ -855,8 +895,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         snowflakeCanvas.appendChild(flake);
         setTimeout(() => { flake.remove(); }, 2000);
     }
-
-    // ... (鼠标移动监听 (3D视差已移除) 保持不变) ...
     document.body.addEventListener('mousemove', (e) => {
         const currentMouseX = e.clientX; const currentMouseY = e.clientY;
         if (!snowflakeThrottleTimer) {
@@ -921,8 +959,8 @@ if (oldRipple) oldRipple.remove();
     }
 
    // 启动
-    loadFavoritesFromStorage();
-    loadAllSongs(); // (修改) 现在会先 fetch playlist.json
+    loadFavoritesFromStorage(); // (保持不变)
+    loadAllSongs(); // (修改) 现在会加载保存的音量和顺序
     applyRippleEffect();
     initNavPill();
 });

@@ -439,7 +439,7 @@ input[type="range"].volume-slider::-webkit-slider-thumb {
 }
 .playlist-song-list li:hover { background: rgba(245, 218, 223, 0.1); }
 .playlist-song-list li.playing { background: rgba(242, 150, 142, 0.2); }
-.song-item-title { font-size: 15px; font-weight: 500; color: var(--primary-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; }
+.song-item-title { font-size: 15px; font-weight: 500; color: var(--primary-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;  }
 .song-item-artist { font-size: 13px; color: var(--secondary-text); margin-left: 8px; flex-shrink: 0; }
 .btn, .playlist-song-list li, .nav-capsule a {
     position: relative;
@@ -555,4 +555,74 @@ input[type="range"].volume-slider::-webkit-slider-thumb {
     border-top: 2px solid var(--c-salmon);
     /* (可选) 稍微平移，为线条腾出空间 */
     transform: translateY(2px);
+}
+/* === 13. (NEW) 播放列表 "正在播放" 动画 === */
+
+/* 1. 移除旧的背景高亮 */
+.playlist-song-list li.playing {
+    background: none; /* 移除背景色 */
+}
+
+/* 2. 让 li 变成 flex 容器来对齐图标和文字 
+   (注意: 如果您在 `style.css` 的 520 行左右已经有了
+    .playlist-song-list li { ... } 规则，
+    请确保它包含 `display: flex;` 和 `align-items: center;`)
+*/
+.playlist-song-list li {
+    display: flex;
+    align-items: center;
+    /* (您已有的 padding, border-radius 等样式会保持不变) */
+}
+
+/* 3. 动画图标容器 */
+.playing-icon-container {
+    width: 16px;  /* 图标宽度 */
+    height: 16px; /* 图标高度 */
+    display: flex;
+    align-items: flex-end; /* 让 bar 从底部开始对齐 */
+    justify-content: space-between;
+    margin-left: 12px; /* 图标和文字的间距 */
+    flex-shrink: 0; /* 防止容器在 flex 布局中被压缩 */
+}
+
+/* 4. 动画 bar (单个竖条) */
+.playing-bar {
+    width: 3px; /* 每个 bar 的宽度 */
+    height: 100%; /* 默认占满 (将在动画中被覆盖) */
+    background: var(--c-salmon); /* 使用您的主题色 */
+    border-radius: 2px;
+    
+    /* 关键: 绑定动画 */
+    animation-name: playlist-playing-bar;
+    animation-duration: 1.2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    
+    /* 默认设为暂停, 等待 JS 启动 */
+    animation-play-state: paused; 
+}
+
+/* 5. 错开动画延迟, 营造跳动感 */
+.playing-bar:nth-child(1) {
+    animation-delay: 0s;
+}
+.playing-bar:nth-child(2) {
+    animation-delay: -0.2s; /* 提前 0.2s 开始 */
+}
+.playing-bar:nth-child(3) {
+    animation-delay: -0.4s; /* 提前 0.4s 开始 */
+}
+
+/* 6. 动画关键帧 (高度在 20% 和 100% 之间跳动) */
+@keyframes playlist-playing-bar {
+    0%   { height: 20%; }
+    50%  { height: 100%; }
+    100% { height: 20%; }
+}
+.song-title-wrapper {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;  /* 让这个 wrapper 占据所有可用空间 */
+    flex-shrink: 1; /* 允许它在空间不足时收缩 */
+    overflow: hidden; /* 关键: 隐藏过长的歌名 */
 }
