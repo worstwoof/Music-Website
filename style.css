@@ -535,3 +535,24 @@ input[type="range"].volume-slider::-webkit-slider-thumb {
     filter: drop-shadow(0 0 8px var(--c-salmon));
     transform: scale(1.1);
 }
+/* === (新增) 12. 播放列表拖拽排序样式 === */
+
+/* 1. 提示用户列表项可以拖拽 */
+.playlist-song-list li {
+    cursor: grab; /* 鼠标悬停时显示“抓取”手势 */
+}
+
+/* 2. 项目正在被拖拽时的样式 */
+.playlist-song-list li.dragging {
+    cursor: grabbing; /* 拖拽时显示“抓紧”手势 */
+    opacity: 0.5;
+    background: rgba(245, 218, 223, 0.1); /* 拖拽时轻微高亮 */
+}
+
+/* 3. 拖拽到某个项目“上方”时的样式 */
+.playlist-song-list li.drag-over {
+    /* 在项目顶部显示一条线，指示释放后将插入到此处 */
+    border-top: 2px solid var(--c-salmon);
+    /* (可选) 稍微平移，为线条腾出空间 */
+    transform: translateY(2px);
+}
