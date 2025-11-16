@@ -200,8 +200,8 @@ body {
     height: 200px;
     background: radial-gradient(
         circle,
-        rgba(147, 112, 219, 0.3) 0%,     /* 降低透明度从 1 到 0.3 */
-        rgba(147, 112, 219, 0.15) 30%,   /* 添加过渡层 */
+        rgba(32, 178, 170, 0.3) 0%,     /* 降低透明度从 1 到 0.3 */
+        rgba(32, 178, 170, 0.15) 30%,   /* 添加过渡层 */
         transparent 70%
     );
     opacity: 0;
@@ -233,14 +233,14 @@ body {
 }
 
 .cta-button:hover {
-    color: #9370DB;
+    color:  #058460;
     text-shadow: 
-        0 0 8px rgba(147, 112, 219, 0.5),    
-        0 0 15px rgba(147, 112, 219, 0.3);  
+        0 0 8px rgba(32, 178, 170, 0.5),    
+        0 0 15px rgba(32, 178, 170, 0.3);  
     border-color: white;
     transform: translateY(-5px) scale(1.05);
     box-shadow: 
-        0 0 25px rgba(147, 112, 219, 0.3),  
+        0 0 25px rgba(32, 178, 170, 0.3),  
         0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
