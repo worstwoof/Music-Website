@@ -1,0 +1,1251 @@
+/*
+ * style.css
+ * 《音乐世界》音乐播放器样式表
+ *
+ * 1.  全局设置与 CSS 变量 (主题)
+ * 1.5. 【V2 样式】: 动态流星 (z-index: 0)
+ * 1.6. 【V3.3 新增】: 鼠标跟随雪花 (z-index: 100)
+ * 2.  基础与通用样式
+ * 3.  顶部导航栏 (z-index: 1000)
+ * 4.  【V2 样式】: WebGL 动态背景 (Vanta.js, z-index: 1)
+ * 5.  锚点侧边栏 (z-index: 999)
+ * 6.  【V2 样式】: 内容区域 (z-index: 2)
+ * 7.  内容轮播 (Marquee)
+ * (7.5. V3 动态网格 已移除)
+ * 7.6.【V3 保留】: 3D Coverflow (MV)
+ * 8.  排行榜
+ * 9.  【V2 样式】: 页脚 (z-index: 2)
+ * 10. 登录弹窗 (毛玻璃)
+ * 11. View Transitions 详情页
+ */
+
+/* * =======================================
+ * 1. 全局设置与 CSS 变量 (主题)
+ * =======================================
+ */
+:root {
+  /* ... (变量定义与 V2 相同, 此处省略) ... */
+  /* 字体 (来自 02) */
+  /* --font-main: "Arial", sans-serif; */
+  /* V3.1: 被 Noto Sans 替换 */
+  --font-main: "Noto Sans SC", "Arial", sans-serif;
+  /* V3.2: 引入 Noto Sans SC */
+  --font-hero-title: 'ZCOOL KuaiLe', 'Great Vibes', cursive;
+  /* V3.2: 引入艺术字体 */
+
+  /* 【V2 新增】: 排行榜明亮颜色 (来自 01) */
+  --color-chart-1: #F2926E;
+  --color-chart-2: #AF7DAC;
+  --color-chart-3: #3f88c5;
+  --color-chart-4: #6a994e;
+  /* 排行榜次要文本 (用于暗色模式) */
+  --text-chart-secondary: #666;
+
+  /* * ----- 模式 1: 明亮模式 (默认) ----- */
+  --bg-body: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  --bg-header: rgba(255, 255, 255, 0);
+  --bg-header-scrolled: rgba(255, 255, 255, 0.8);
+  --bg-card: #ffffff;
+  --bg-modal: #ffffff;
+  --bg-input: #fafafa;
+  --bg-input-focus: #ffffff;
+  --bg-footer: linear-gradient(135deg, #423b63, #1b305d);
+
+  --text-primary: #333;
+  --text-secondary: #666;
+  --text-header: #ffffff;
+  --text-header-scrolled: #423b63;
+  --text-hero-title: #ffffff;
+  --text-hero-subtitle: #f5dadf;
+  --text-footer: #f5dadf;
+
+  --color-brand-1: #423b63;
+  --color-brand-2: #af7dac;
+  --color-brand-3: #f2926e;
+
+  --color-brand-1-rgb: 66, 59, 99;
+  --color-brand-2-rgb: 175, 125, 172;
+
+  /* V3.1 恢复: 卡片毛玻璃使用此变量 (V2 样式) */
+  --bg-card-rgb: 255, 255, 255;
+
+
+  --color-brand-gradient: linear-gradient(135deg, var(--color-brand-2), var(--color-brand-3));
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-border: #f5dadf;
+  --color-border-input: #f5dadf;
+  --color-border-input-focus: #af7dac;
+  --color-chart-border: #f0f0f0;
+
+  --color-star-rgb: 66, 59, 99;
+}
+
+/* * ----- 模式 2: 暗色模式 ----- */
+body.dark-mode {
+  --bg-body: #011230;
+  --bg-header: #011230;
+  --bg-header-scrolled: rgba(27, 48, 93, 0.8);
+  --bg-card: #1B305D;
+  --bg-modal: #1B305D;
+  --bg-input: #011230;
+  --bg-input-focus: #1B305D;
+  --bg-footer: #011230;
+
+  --text-primary: #F5DADF;
+  --text-secondary: #AF7DAC;
+  --text-header: #F5DADF;
+  --text-header-scrolled: #F5DADF;
+  --text-hero-title: #ffffff;
+  --text-hero-subtitle: #f5dadf;
+  --text-footer: #AF7DAC;
+
+  --color-brand-1: #F5DADF;
+  --color-brand-2: #af7dac;
+  --color-brand-3: #f2926e;
+
+  --color-brand-1-rgb: 245, 218, 223;
+  --color-brand-2-rgb: 175, 125, 172;
+
+  /* V3.1 恢复: 卡片毛玻璃使用此变量 (V2 样式) */
+  --bg-card-rgb: 27, 48, 93;
+  /* #1B305D */
+
+  --color-brand-gradient: linear-gradient(135deg, var(--color-brand-2), var(--color-brand-3));
+  --color-shadow: rgba(0, 0, 0, 0.2);
+  --color-border: #423B63;
+  --color-border-input: #423B63;
+  --color-border-input-focus: #f2926e;
+
+  --color-chart-border: #423B63;
+  --text-chart-secondary: var(--text-secondary);
+  --color-chart-1: #F2926E;
+  --color-chart-2: #AF7DAC;
+  --color-chart-3: #5aa4e6;
+  --color-chart-4: #8bc34a;
+
+  --color-star-rgb: 255, 255, 255;
+}
+
+
+/* * =======================================
+ * 1.5. 【V2 样式】: 动态流星 (z-index: 0)
+ * =======================================
+ */
+.shooting-stars-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* V3.1 恢复: z-index: 0 (V2 样式) */
+  z-index: 0;
+  overflow: hidden;
+}
+
+.shooting-star {
+  /* ... (流星动画样式不变, 此处省略) ... */
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, rgba(var(--color-star-rgb), 0.8) 0%, rgba(var(--color-star-rgb), 0) 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(var(--color-star-rgb), 0.7);
+  animation: shootStar 6s linear infinite;
+  opacity: 0;
+  transform: rotateZ(35deg);
+  filter: blur(0.5px);
+}
+
+@keyframes shootStar {
+  0% {
+    transform: translate(-100vw, -100vh) rotateZ(35deg);
+    opacity: 0;
+  }
+
+  1% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  51% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 0;
+  }
+
+  100% {
+    transform: translate(100vw, 100vh) rotateZ(35deg);
+    opacity: 0;
+  }
+}
+
+
+/* * =======================================
+ * 2. 基础与通用样式
+ * =======================================
+ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  /* JS 控制平滑滚动 */
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background 0.4s ease;
+  position: relative;
+  background-attachment: fixed;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* * =======================================
+ * 3. 顶部导航栏 (z-index: 1000)
+ * =======================================
+ */
+.header {
+  /* ... (z-index: 1000 保持在最前) ... */
+  /* ... (其他样式不变, 此处省略) ... */
+  background: var(--bg-header);
+  backdrop-filter: blur(0px);
+  padding: 15px 5%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  transition: all 0.4s ease;
+}
+
+.header.scrolled {
+  background: var(--bg-header-scrolled);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px var(--color-shadow);
+}
+
+.header-container {
+  /* ... */
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.logo {
+  /* ... */
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-header);
+  display: flex;
+  align-items: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  /* V3.2: 增加立体感 */
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+  /* V3.2: 增加阴影过渡 */
+}
+
+.header.scrolled .logo {
+  color: var(--text-header-scrolled);
+  text-shadow: none;
+  /* V3.2: 滚动后（亮色模式）移除阴影 */
+}
+
+body.dark-mode .header.scrolled .logo {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  /* V3.2: 暗色模式保持阴影 */
+}
+
+.logo i {
+  margin-right: 8px;
+  font-size: 26px;
+}
+
+.search-container {
+  /* ... */
+  flex: 1;
+  max-width: 400px;
+  position: relative;
+  margin: 0 20px;
+}
+
+.search-input {
+  /* ... */
+  width: 100%;
+  padding: 12px 45px 12px 15px;
+  border: 2px solid var(--color-border-input);
+  border-radius: 25px;
+  font-size: 16px;
+  outline: none;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  /* ... */
+  border-color: var(--color-border-input-focus);
+  background: var(--bg-input-focus);
+}
+
+.search-icon {
+  /* ... */
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-brand-2);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.nav-options {
+  /* ... */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.nav-item {
+  /* ... */
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-header);
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.header.scrolled .nav-item {
+  color: var(--text-header-scrolled);
+}
+
+.nav-item:hover,
+.nav-item.active {
+  color: white;
+}
+
+.nav-pill {
+  /* ... */
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--color-brand-2);
+  border-radius: 20px;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  z-index: 0;
+  opacity: 0;
+}
+
+.nav-controls {
+  /* ... */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-register {
+  /* ... */
+  padding: 8px 16px;
+  background: var(--color-brand-gradient);
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 14px;
+}
+
+.login-register:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.theme-toggle {
+  /* ... */
+  background: var(--bg-input);
+  color: var(--color-brand-2);
+  border: 2px solid var(--color-border-input);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  /* ... */
+  border-color: var(--color-brand-3);
+  color: var(--color-brand-3);
+}
+
+.theme-toggle .sun-icon {
+  display: none;
+}
+
+.theme-toggle .moon-icon {
+  display: block;
+}
+
+body.dark-mode .theme-toggle .sun-icon {
+  display: block;
+}
+
+body.dark-mode .theme-toggle .moon-icon {
+  display: none;
+}
+
+
+/* * =======================================
+ * 4. 【V2 样式】: WebGL 动态背景 (Vanta.js, z-index: 1)
+ * =======================================
+ */
+.vanta-hero {
+  /* V3.1 恢复: V2 样式, 100vh 高度, 相对定位 */
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  /* V3.1 恢复: V2 z-index */
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+.vanta-hero .vanta-canvas {
+  filter: brightness(0.8);
+}
+
+.vanta-hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 80%;
+}
+
+/* ... (slide-title, slide-subtitle 样式不变) ... */
+.slide-title {
+  font-family: var(--font-hero-title);
+  /* V3.2: 使用艺术字体 */
+  font-size: 80px;
+  /* V3.2: 增大字号 */
+  margin-bottom: 20px;
+  /* V3.2: 增强的 3D 立体阴影 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5),
+    /* 主阴影 */
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    /* 柔和阴影 */
+    0 0 20px rgba(255, 255, 255, 0.2);
+  /* 轻微光晕 */
+  font-weight: normal;
+  /* V3.2: 艺术字体通常不需要 bold */
+  letter-spacing: 4px;
+  /* V3.2: 增加间距 */
+  color: var(--text-hero-title);
+}
+
+.slide-subtitle {
+  font-size: 32px;
+  /* V3.2: 增大字号 */
+  margin-bottom: 30px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  /* V3.2: 增加阴影 */
+  font-weight: 400;
+  /* V3.2: 适配 Noto Sans */
+  color: var(--text-hero-subtitle);
+  letter-spacing: 1px;
+  /* V3.2: 增加间距 */
+}
+
+
+/* * =======================================
+ * 5. 锚点侧边栏 (z-index: 999)
+ * =======================================
+ */
+.sidebar-nav {
+  /* ... (z-index: 999 位于 Header(1000) 之下, 内容(2) 之上) ... */
+  /* ... (其他样式不变, 此处省略) ... */
+  position: fixed;
+  top: 150px;
+  right: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 20px;
+  cursor: grab;
+  background: rgba(var(--color-brand-1-rgb), 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(var(--color-brand-1-rgb), 0.15);
+  box-shadow: 0 2px 10px var(--color-shadow);
+}
+
+.sidebar-nav.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.sidebar-link {
+  /* ... */
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.sidebar-link:hover {
+  /* ... */
+  color: var(--color-brand-3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-link.active {
+  /* ... */
+  color: white;
+  background: var(--color-brand-2);
+}
+
+
+/* * =======================================
+ * 6. 【V2 样式】: 内容区域 (z-index: 2)
+ * =======================================
+ */
+.main-content-area {
+  padding: 80px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  /* V3.1 恢复: V2 z-index (在 Vanta(1) 和 流星(0) 之上) */
+  z-index: 2;
+
+  /* V3.1 移除: V3 的 margin-top, 毛玻璃, 圆角, 边框, 阴影 */
+}
+
+.content-section {
+  margin-bottom: 60px;
+}
+
+/* ... (section-title 样式不变) ... */
+.section-title {
+  font-size: 28px;
+  color: var(--text-primary);
+  margin-bottom: 25px;
+  text-align: center;
+  font-weight: normal;
+  text-shadow: 0 1px 3px var(--color-shadow);
+  /* V3.2: 增加立体感 */
+}
+
+
+/* * =======================================
+ * 7. 内容轮播 (Marquee)
+ * =======================================
+ */
+.content-carousel-container {
+  position: relative;
+  perspective: 1500px;
+}
+
+.content-carousel {
+  overflow: hidden;
+}
+
+.content-track {
+  display: flex;
+  gap: 20px;
+  /* V3.1 移除: V2 的 transition, GSAP 会接管 */
+  /* transition: transform 0.5s ease; */
+}
+
+/* V3.1: Marquee 样式 (V3 样式保留) */
+[data-marquee="true"] .content-carousel {
+  overflow: visible;
+  /* Marquee 必须可见 */
+}
+
+[data-marquee="true"] .carousel-btn {
+  display: none;
+  /* Marquee 隐藏按钮 */
+}
+
+[data-marquee="true"] .content-track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  /* GSAP 会控制 transform */
+}
+
+
+.content-card {
+  /* ... (3D 倾斜样式不变) ... */
+  background: transparent;
+  border-radius: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+  flex-basis: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transform-style: preserve-3d;
+  transition: transform 0.1s linear;
+}
+
+.content-card.mv-card {
+  flex-basis: 340px;
+}
+
+.card-image {
+  /* ... (样式不变) ... */
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px var(--color-shadow);
+}
+
+.content-card.mv-card .card-image {
+  aspect-ratio: 16 / 9;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.play-icon {
+  /* ... (样式不变) ... */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  opacity: 0;
+  z-index: 5;
+}
+
+.card-content {
+  padding: 15px;
+
+  /* V3.1 恢复: V2 的卡片毛玻璃效果 */
+  background: rgba(var(--bg-card-rgb), 0.5);
+  /* 0.5 透明度 */
+  backdrop-filter: blur(8px);
+  /* 模糊 8px */
+  border: 1px solid rgba(var(--bg-card-rgb), 0.15);
+  /* 微妙边框 */
+
+  border-radius: 15px;
+  box-shadow: 0 5px 20px var(--color-shadow);
+}
+
+/* ... (card-title, card-artist 样式不变) ... */
+.card-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-artist {
+  font-size: 14px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* (V2 轮播按钮 - 已被 Marquee 隐藏) */
+.content-carousel-container .carousel-btn {
+  /* ... */
+  position: absolute;
+  top: calc(50% - 24px);
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: var(--bg-card);
+  color: var(--color-brand-2);
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px var(--color-shadow);
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-carousel-container .carousel-btn:hover {
+  /* ... */
+  background: var(--color-brand-2);
+  color: white;
+}
+
+.content-carousel-container .carousel-btn.prev {
+  left: -20px;
+}
+
+.content-carousel-container .carousel-btn.next {
+  right: -20px;
+}
+
+.content-carousel-container .carousel-btn:disabled {
+  /* ... */
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+
+/* * =======================================
+ * 7.5.【V3.1 移除】: 动态网格 (新歌发行)
+ * =======================================
+ */
+/* (V3.1: 此处 CSS 已被删除) */
+
+
+/* * =======================================
+ * 7.6.【V3 保留】: 3D Coverflow (MV)
+ * =======================================
+ */
+.mv-swiper-container {
+  width: 100%;
+  padding-top: 30px;
+  padding-bottom: 50px;
+  /* 为分页器留空间 */
+}
+
+.mv-swiper-container .swiper-slide {
+  width: 340px;
+  /* 必须指定宽度 */
+}
+
+/* V3.1: Swiper 分页器主题色 */
+.mv-swiper-container .swiper-pagination-bullet {
+  background: var(--text-secondary);
+}
+
+.mv-swiper-container .swiper-pagination-bullet-active {
+  background: var(--color-brand-2);
+}
+
+
+/* * =======================================
+ * 8. 排行榜
+ * =======================================
+ */
+.charts-container {
+  /* ... (样式不变, 此处省略) ... */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.chart-column {
+  /* ... */
+  background-color: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-top: 4px solid var(--color-chart-1);
+  box-shadow: 0 5px 20px var(--color-shadow);
+  transition: all 0.3s ease;
+}
+
+.chart-column:hover {
+  /* ... */
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px var(--color-shadow);
+}
+
+.chart-column:nth-child(1) {
+  border-top-color: var(--color-chart-1);
+}
+
+.chart-column:nth-child(2) {
+  border-top-color: var(--color-chart-2);
+}
+
+.chart-column:nth-child(3) {
+  border-top-color: var(--color-chart-3);
+}
+
+.chart-column:nth-child(4) {
+  border-top-color: var(--color-chart-4);
+}
+
+.chart-title {
+  /* ... */
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  text-shadow: 0 1px 2px var(--color-shadow);
+  /* V3.2: 增加立体感 */
+}
+
+.chart-list {
+  list-style: none;
+}
+
+.chart-list li {
+  /* ... */
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--color-chart-border);
+  font-size: 0.95rem;
+  color: var(--text-chart-secondary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.chart-list li:last-child {
+  border-bottom: none;
+}
+
+.chart-list li:hover {
+  /* ... */
+  background-color: var(--bg-input-focus);
+  color: var(--text-primary);
+}
+
+.chart-list li span {
+  /* ... */
+  font-weight: bold;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin-right: 0.75rem;
+  width: 1.5rem;
+}
+
+.chart-list li a {
+  /* ... */
+  color: inherit;
+  text-decoration: none;
+  flex: 1;
+  transition: color 0.2s ease;
+}
+
+.chart-list li:nth-child(1) span,
+.chart-list li:nth-child(2) span,
+.chart-list li:nth-child(3) span {
+  color: var(--color-chart-1);
+}
+
+
+/* * =======================================
+ * 9. 【V2 样式】: 页脚 (z-index: 2)
+ * =======================================
+ */
+.site-footer {
+  background: var(--bg-footer);
+  border-top: 1px solid var(--color-border);
+  padding: 3rem 0;
+  color: var(--text-footer);
+  margin-top: 50px;
+  transition: background 0.4s ease, color 0.4s ease;
+  position: relative;
+  /* V3.1 恢复: V2 z-index */
+  z-index: 2;
+}
+
+/* ... (footer-content, footer-links, copyright 样式不变) ... */
+.footer-content {
+  /* ... */
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.footer-links {
+  /* ... */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  /* ... */
+  font-size: 0.9rem;
+  color: var(--text-footer);
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--color-brand-3);
+}
+
+.copyright {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+
+/* * =======================================
+ * 10. 登录弹窗 (毛玻璃)
+ * =======================================
+ */
+.modal-overlay {
+  /* ... (样式不变, z-index: 2000 保持在最前) ... */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.show {
+  display: flex;
+  opacity: 1;
+}
+
+.modal-content {
+  /* ... */
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  padding: 30px;
+  position: relative;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+  background: rgba(var(--color-brand-2-rgb), 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(var(--color-brand-2-rgb), 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-overlay.show .modal-content {
+  transform: translateY(0);
+}
+
+.close-modal {
+  /* ... */
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+  color: var(--color-brand-2);
+}
+
+.modal-title {
+  /* ... */
+  font-size: 24px;
+  color: var(--text-primary);
+  margin-bottom: 25px;
+  text-align: center;
+  text-shadow: 0 1px 3px var(--color-shadow);
+  /* V3.2: 增加立体感 */
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  /* ... */
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.form-input {
+  /* ... */
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid var(--color-border-input);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  /* ... */
+  border-color: var(--color-border-input-focus);
+  background: var(--bg-input-focus);
+}
+
+.login-btn {
+  /* ... */
+  width: 100%;
+  padding: 12px;
+  background: var(--color-brand-gradient);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.modal-footer {
+  /* ... */
+  margin-top: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.modal-footer a {
+  color: var(--color-brand-2);
+  text-decoration: none;
+}
+
+.modal-footer a:hover {
+  text-decoration: underline;
+}
+
+
+/* * =======================================
+ * 11. View Transitions 详情页
+ * =======================================
+ */
+.detail-page-container {
+  /* ... (样式不变, z-index: 3000 保持在最前) ... */
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-body);
+  z-index: 3000;
+  overflow-y: auto;
+  padding: 20px;
+  padding-top: 80px;
+}
+
+.detail-page-container.show {
+  display: block;
+}
+
+.detail-content {
+  /* ... */
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 30px;
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px var(--color-shadow);
+}
+
+.close-detail-btn {
+  /* ... */
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-input);
+  color: var(--color-brand-2);
+  border: 2px solid var(--color-border-input);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 3010;
+}
+
+.close-detail-btn:hover {
+  /* ... */
+  background: var(--color-brand-2);
+  color: white;
+  transform: rotate(90deg);
+}
+
+.detail-card-image {
+  /* ... */
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px var(--color-shadow);
+  view-transition-name: detail-hero-image;
+}
+
+.detail-card-image img {
+  /* ... */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-card-title {
+  /* ... */
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  view-transition-name: detail-hero-title;
+  text-shadow: 0 1px 3px var(--color-shadow);
+  /* V3.2: 增加立体感 */
+}
+
+.detail-card-artist {
+  /* ... */
+  font-size: 18px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.detail-placeholder-text {
+  line-height: 1.7;
+}
+
+/* ... (View Transition 动态类不变) ... */
+.card-image.transition-active {
+  view-transition-name: detail-hero-image;
+}
+
+.card-title.transition-active {
+  view-transition-name: detail-hero-title;
+}
+
+/* * =======================================
+ * 1.6. 【V3.3 新增】: 鼠标跟随雪花 (z-index: 100)
+ * =======================================
+ */
+
+/* 1. 画布 (承载雪花) */
+#snowflake-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  /* * 关键 z-index: 100
+   * 高于: .shooting-stars (0), .vanta-hero (1), .main-content-area (2)
+   * 低于: .sidebar-nav (999), .header (1000), .modal-overlay (2000)
+   */
+  z-index: 100;
+  pointer-events: none;
+  /* 鼠标可以穿透它 */
+  overflow: hidden;
+  /* 防止雪花在画布外生成 */
+}
+
+/* 2. 单个雪花点 */
+.mouse-snowflake {
+  position: absolute;
+  /* 它的 left/top 会由 JS 设定 */
+  width: 4px;
+  height: 4px;
+
+  /* (修改点) 我们用白色微光，更像雪花 */
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  filter: blur(0.5px);
+
+  pointer-events: none;
+
+  /* 关键：应用“飘落”动画！
+  * 2s 动画时长, 线性, forwards (动画结束后停在最后状态)
+  */
+  animation: fallAndDrift 2s linear forwards;
+}
+
+/* 3. “飘落” 动画 */
+@keyframes fallAndDrift {
+
+  /* 刚生成时 */
+  from {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+
+  /* 2秒后 (动画结束时) */
+  to {
+    /* --drift-x 和 --drift-y 将由 JS 随机设定。
+    * 这能让每个雪花飘落的路径都独一无二！
+    */
+    transform: translate(var(--drift-x, 0px), var(--drift-y, 150px)) scale(0.2);
+    opacity: 0;
+    /* 最终消失 */
+  }
+}
