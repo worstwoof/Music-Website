@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云音乐播放器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+   <link rel="stylesheet" href="start.css">
+</head>
+<body>
+     <div id="snowflake-canvas"></div>
+    <div class="page-container" id="pageContainer">
+        <!-- 第一页：欢迎页-->
+        <div class="page" id="page1">
+            <!-- 流星 -->
+            <span class="meteor"></span>
+            <span class="meteor"></span>
+            <span class="meteor"></span>
+            <span class="meteor"></span>
+
+            <div class="welcome-content">
+                <!-- 左侧：文字和按钮区域 -->
+                <div class="welcome-text">
+                    <div class="welcome-title">
+                        <h3>♪♪♪♪</h3>
+                        <h1>星乐</h1>
+                    </div>
+                    <p class="welcome-desc">在星空下聆听，让每一首歌都成为永恒的记忆~</p>
+                    <p class="welcome-desc">探索音乐世界，用心聆听每一瞬的音符律动~</p>
+                   
+                    <button class="cta-button" onclick="goToPlayer()">
+                     <span>立即体验 <i class="fas fa-arrow-right"></i></span>
+                    </button>
+                </div>
+            </div>
+            
+            <p class="scroll-hint">下滑查看详情介绍</p> 
+            <div class="scroll-indicator" onclick="scrollToPage(2)">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <!-- 第二页：介绍首页 -->
+        <div class="page" id="page2">
+            <div class="feature-content">
+                <!-- 左侧：标题和描述 -->
+                <div class="feature-left">
+                    <div class="feature-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h2>精选首页</h2>
+                    <p>为你精心挑选每一首歌曲，发现你的专属音乐世界。</p>
+                </div>
+
+                <!-- 右侧：功能卡片 -->
+                <div class="feature-right">
+                    <div class="feature-item">
+                        <i class="fas fa-music"></i>
+                        <h4>每日推荐</h4>
+                        <p>发现新天地</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-search"></i>
+                        <h4>实时搜索</h4>
+                        <p>精准查询</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-list-ul"></i>
+                        <h4>列表展示</h4>
+                        <p>想要的功能全都有</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-headphones"></i>
+                        <h4>高品质音质</h4>
+                        <p>无损音乐享受</p>
+                    </div>
+                    <img src="graphics/rabbit.png" alt="rabbit" class="rabbit">
+                </div>
+            </div>
+            <div class="scroll-indicator" onclick="scrollToPage(3)">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <!-- 第三页：歌词功能 -->
+        <div class="page" id="page3">
+            <span class="butterfly"></span>
+            <span class="butterfly"></span>
+            <span class="butterfly"></span>
+            <span class="butterfly"></span>
+
+            <div class="feature-content">
+                <div class="feature-left">
+                    <div class="feature-icon">
+                        <i class="fas fa-align-left"></i>
+                    </div>
+                    <h2>动态歌词</h2>
+                    <p>逐字精准滚动,沉浸在音乐的每一个字符中。</p>
+                </div>
+
+                <div class="feature-right">
+                    <div class="feature-item">
+                        <i class="fas fa-text-height"></i>
+                        <h4>逐字显示</h4>
+                        <p>精准到每个字的滚动</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-highlighter"></i>
+                        <h4>高亮突出</h4>
+                        <p>精准找到正在播放的句子</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-palette"></i>
+                        <h4>精美主题</h4>
+                        <p>赏心悦目的体验</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-image"></i>
+                       <h4>歌曲封面</h4>
+                        <p>高清特写</p>
+                    </div>
+                    <img src="graphics/rabbit.png" alt="rabbit" class="rabbit">
+                </div>
+            </div>
+            <div class="scroll-indicator" onclick="scrollToPage(4)">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <!-- 第四页：我的收藏 -->
+        <div class="page" id="page4">
+            <div class="flower flower-top-left" id="flowerTopLeft"></div>
+            <div class="flower flower-top-right" id="flowerTopRight"></div>
+            <div class="flower flower-bottom-left" id="flowerBottomLeft"></div>
+            <div class="flower flower-bottom-right" id="flowerBottomRight"></div>
+
+            <div class="feature-content">
+                <div class="feature-left">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h2>我的收藏</h2>
+                    <p>珍藏每一个心动瞬间，记录你的音乐旅程</p>
+                </div>
+
+                <div class="feature-right">
+                    <div class="feature-item">
+                        <i class="fas fa-play-circle"></i>
+                         <h4>一键播放</h4>
+                        <p>随时随地畅听</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-heart"></i>
+                        <h4>一键收藏</h4>
+                        <p>记录你的音乐旅程</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-list"></i>
+                       <h4>歌单管理</h4>
+                        <p>创建和管理你的歌单</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-paint-brush"></i>
+                        <h4>精美皮肤</h4>
+                        <p>整整齐齐，简约大气</p>
+                    </div>
+                    <img src="graphics/rabbit.png" alt="rabbit" class="rabbit">
+                </div>
+            </div>
+            <div class="scroll-indicator" onclick="scrollToPage(1)">
+                <i class="fas fa-chevron-up"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页面指示器 -->
+    <div class="page-indicator">
+        <div class="page-dot active" onclick="scrollToPage(1)"></div>
+        <div class="page-dot" onclick="scrollToPage(2)"></div>
+        <div class="page-dot" onclick="scrollToPage(3)"></div>
+        <div class="page-dot" onclick="scrollToPage(4)"></div>
+    </div>
+
+   <script src="function.js"></script>
+   <script src="mouse-trail.js"></script> 
+</body>
+</html>

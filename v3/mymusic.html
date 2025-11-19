@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐世界 | 我的音乐</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="mymusic.css">
+
+    <style>
+        /* --- CSS for Full Screen Player Modal (V4 - Final Animation) --- */
+        #full-player-modal {
+            /* 1. 布局 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9998;
+
+            /* 2. 初始状态 (在屏幕下方, 不可见) */
+            transform: translateY(100%);
+            visibility: hidden;
+            
+            /* 3. 动画规则 (关键) */
+            /* a) transform 动画 0.4 秒 (用于上升和下降) */
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+            /* b) visibility 动画 0.4 秒 (用于下降时延迟隐藏) */
+                        visibility 0.4s;
+        }
+
+        #full-player-modal.show {
+            /* 4. .show 状态 (在屏幕上, 可见) */
+            transform: translateY(0);
+            visibility: visible;
+
+            /* 5. 动画覆盖 (关键) */
+            /* a) transform 动画 0.4 秒 (保持不变) */
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+            /* b) visibility 立即生效 (用于上升时立即显示) */
+                        visibility 0s;
+        }
+
+        #close-player-modal {
+            /* 关闭按钮 (已修复居中) */
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px; 
+            font-weight: 300;
+            color: white;
+            background: rgba(0,0,0,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 9999;
+            transition: transform 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1; /* 重置行高，防止干扰 flex 布局 */
+            padding-bottom: 10px; /* 增加一点底部内边距，将 "X" 向下推移 */
+        }
+        #close-player-modal:hover {
+            transform: scale(1.1) rotate(90deg);
+            background: rgba(0,0,0,0.4);
+        }
+
+        #player-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+    </head>
+<body>
+    <div class="shooting-stars-container"></div>
+    
+    <div id="snowflake-canvas"></div>
+
+    <header class="header" id="header">
+        <div class="header-container">
+            <div class="logo"><i class="fas fa-music"></i> 音乐世界</div>
+
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="搜索音乐、歌手..." />
+                <span class="search-icon"><i class="fas fa-search"></i></span>
+                <div class="search-dropdown" id="search-dropdown"></div>
+            </div>
+
+            <nav class="nav-options">
+                <a href="homepage.html#home" class="nav-item">
+                <i class="fas fa-home"></i> 首页
+                </a>
+                <a href="mymusic.html" class="nav-item">
+                <i class="fas fa-music"></i> 我的音乐
+                </a>
+                <a href="homepage.html#discover" class="nav-item">
+                <i class="fas fa-compass"></i> 发现
+                </a>
+                <a href="homepage.html#new-releases" class="nav-item">
+                <i class="fas fa-magic"></i> 新歌
+                </a>
+                <a href="homepage.html#charts" class="nav-item">
+                <i class="fas fa-trophy"></i> 排行榜
+                </a>
+                <a href="homepage.html#mv" class="nav-item">
+                <i class="fas fa-video"></i> MV
+                </a>
+                <div class="nav-pill"></div>
+            </nav>
+
+            <div class="nav-controls">
+                <button class="login-register">登录/注册</button>
+                <button id="theme-toggle-btn" class="theme-toggle" title="切换主题">
+                    <i class="fas fa-sun sun-icon"></i>
+                    <i class="fas fa-moon moon-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section id="mymusic" class="my-music-section">
+        <div class="container">
+            <div class="sidebar">
+                <div class="profile">
+                    <img src="https://th.bing.com/th/id/OIP.oFazgA0xj09WmTqa4k3nRAAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3" alt="用户头像" class="profile-img">
+                    <h2>DOGE</h2>
+                    <p>音乐爱好者</p>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">128</div>
+                        <div class="stat-label">收藏</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">关注</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">1,256</div>
+                        <div class="stat-label">粉丝</div>
+                    </div>
+                </div>
+                
+                <ul class="nav-menu">
+                    <li class="nav-item-music active"><i class="fas fa-heart"></i> 我的收藏</li>
+                    <li class="nav-item-music"><i class="fas fa-history"></i> 最近播放</li>
+                    <li class="nav-item-music"><i class="fas fa-download"></i> 本地音乐</li>
+                    <li class="nav-item-music"><i class="fas fa-user-edit"></i> 编辑资料</li>
+                </ul>
+            </div>
+            
+            <div class="main-content">
+                <div class="content-section active" id="favorites">
+                    <div class="header-music">
+                        <h1>我的收藏</h1>
+                        
+                    </div>
+                    
+                    <div class="music-grid" id="favorites-grid">
+                        </div>
+                </div>
+                
+                <div class="content-section" id="recent">
+                    <div class="header-music">
+                        <h1>最近播放</h1>
+                        
+                    </div>
+                    
+                    <div class="playlist" id="recent-playlist-container">
+                        <div class="playlist-header">
+                            <div>#</div>
+                            <div>歌曲标题</div>
+                            <div>歌手</div>
+                            <div>专辑</div>
+                            <div><i class="far fa-clock"></i></div>
+                        </div>
+                        <div class="playlist-body" id="recent-playlist-body">
+                            </div>
+                    </div>
+                </div>
+                
+                <div class="content-section" id="local">
+                    <div class="header-music">
+                        <h1>本地音乐</h1>
+                        
+                    </div>
+                    
+                    <div class="local-music-container" id="local-music-container">
+                        </div>
+                </div>
+                
+                <div class="content-section" id="edit-profile">
+                    <div class="header-music">
+                        <h1>编辑资料</h1>
+                    </div>
+                    
+                    <div class="edit-profile-content">
+                        
+                        <div class="profile-avatar-column">
+                            
+                            <div class="profile-preview">
+                                <img src="https://th.bing.com/th/id/OIP.oFazgA0xj09WmTqa4k3nRAAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3" alt="用户头像" class="preview-avatar">
+                                <h3>DOGE</h3>
+                                <p class="preview-bio">音乐爱好者</p>
+                            </div>
+
+                            <div class="form-group-edit avatar-selection-card">
+                                <label class="form-label">选择头像</label>
+                                <div class="avatar-grid-edit">
+                                    <img src="https://th.bing.com/th/id/OIP.oFazgA0xj09WmTqa4k3nRAAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3" alt="头像1" class="avatar-option-edit">
+                                    <img src="https://tse4-mm.cn.bing.net/th/id/OIP-C.J7vqZPUdkyQkLxrF-4WybwAAAA?w=204&h=204&c=7&r=0&o=7&cb=ucfimg2&dpr=1.5&pid=1.7&rm=3&ucfimg=1" alt="头像2" class="avatar-option-edit">
+                                    <img src="https://tse2-mm.cn.bing.net/th/id/OIP-C.oEywjsiW7dW95xq4301aQwAAAA?w=200&h=200&c=7&r=0&o=7&cb=ucfimg2&dpr=1.5&pid=1.7&rm=3&ucfimg=1" alt="头像3" class="avatar-option-edit">
+                                    <img src="https://tse1-mm.cn.bing.net/th/id/OIP-C.Knh5i_ceDHm_cwzEcKFJ2gAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimg2&dpr=1.5&pid=1.7&rm=3&ucfimg=1" alt="头像4" class="avatar-option-edit">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-form-column">
+                            
+                            <div class="edit-form-card">
+                                <h3>个人资料</h3>
+                                <div class="form-group-edit">
+                                    <label class="form-label" for="editUsername">用户名</label>
+                                    <input type="text" id="editUsername" class="form-input" placeholder="请输入用户名" value="DOGE">
+                                </div>
+                                
+                                <div class="form-group-edit">
+                                    <label class="form-label" for="editBio">个人简介</label>
+                                    <textarea id="editBio" class="form-textarea" placeholder="介绍一下你自己..." rows="4">音乐爱好者</textarea>
+                                </div>
+                                
+                                <button class="save-profile-btn" id="saveProfileInPage">保存资料</button>
+                            </div>
+
+                            <div class="edit-form-card security-section">
+                                <h3>账户安全</h3>
+                                <div class="form-group-edit">
+                                    <label class="form-label">电子邮箱</label>
+                                    <input type="email" class="form-input" value="doge@music.com" disabled title="演示功能">
+                                </div>
+                                <div class_form_buttons>
+                                    <button class="btn-security">更改密码</button>
+                                    <button class="btn-security btn-danger">删除账户</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <div class="player-controls">
+
+        <div class="now-playing">
+            <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&q=80" alt="当前播放">
+            <div class="track-info">
+                <h4>富士山下</h4>
+                <p>陈奕迅</p>
+            </div>
+        </div>
+
+        <div class="time-control">
+            <span class="time-current">0:00</span>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <span class="time-total">0:00</span>
+        </div>
+
+        <div class="left-buttons">
+            <button class="btn" id="bottom-btn-repeat" title="切换循环">
+                <img src="icon/24gl-repeat2.png" alt="Repeat" id="bottom-repeat-icon">
+            </button>
+            <button class="btn" id="bottom-btn-favorite" title="收藏">
+                <img src="icon/24gl-heart.png" alt="Favorite" id="bottom-favorite-icon">
+            </button>
+        </div>
+        
+        <div class="center-buttons">
+            <button class="btn btn-large" id="bottom-btn-prev" title="上一首">
+                <img src="icon/24gl-previous.png" alt="Previous">
+            </button>
+            <button class="btn btn-play" id="bottom-play-pause" title="播放/暂停">
+                <img src="icon/24gl-play.png" alt="Play" id="bottom-play-pause-icon">
+            </button>
+            <button class="btn btn-large" id="bottom-btn-next" title="下一首">
+                <img src="icon/24gl-next.png" alt="Next">
+            </button>
+        </div>
+
+        <div class="right-buttons">
+            <button class="btn" id="bottom-btn-playlist" title="播放列表">
+                <img src="icon/24gl-playlistMusic4.png" alt="Playlist">
+            </button>
+            <button class="btn" id="bottom-btn-volume" title="音量/静音">
+                <img src="icon/24gl-volumeHigh.png" alt="Volume" id="bottom-volume-icon">
+            </button>
+            <div class="volume-bar">
+                <div class="volume-level"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">登录音乐世界</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">用户名或邮箱</label>
+                    <input type="text" id="username" class="form-input" placeholder="请输入用户名或邮箱" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <input type="password" id="password" class="form-input" placeholder="请输入密码" required />
+                </div>
+                <button type="submit" class="save-btn">登录</button>
+            </form>
+            <div class="modal-footer">
+                <p>还没有账号？<a href="#">立即注册</a></p>
+                <p><a href="#">忘记密码？</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="mymusic.js"></script>
+    <div id="toast-notification" class="toast-notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">已添加到下一首播放</span>
+    </div>
+    <div id="full-player-modal">
+        <button id="close-player-modal" title="关闭播放器">&times;</button>
+        <iframe id="player-iframe" src="music-player.html" title="全屏播放器"></iframe>
+    </div>
+    <div class="playlist-modal-overlay" id="bottom-playlist-modal-overlay">
+        <div class="playlist-modal" id="bottom-playlist-modal">
+            <div class="modal-header">
+                <h3>播放列表</h3>
+                <button class="btn btn-close" id="bottom-btn-close-modal">&times;</button>
+            </div>
+            <ul class="playlist-song-list" id="bottom-playlist-song-list">
+                </ul>
+        </div>
+    </div>
+    </body>
+</html>

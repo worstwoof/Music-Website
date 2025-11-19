@@ -1,0 +1,688 @@
+/* === 全局设置 & 变量 === */
+:root {
+    --c-darkest-blue: #011230;
+    --c-dark-blue: #1B305D;
+    --c-dark-purple: #423B63;
+    --c-lavender: #AF7DAC;
+    --c-pale-pink: #F5DADF;
+    --c-salmon: #F2926E;
+    --c-dark-purple-alpha: rgba(66, 59, 99, 0.7);
+    --c-darkest-blue-alpha: rgba(1, 18, 48, 0.9);
+    --primary-text: var(--c-pale-pink);     
+    --secondary-text: var(--c-lavender);   
+    --card-bg: rgba(27, 48, 93, 0.1);
+    --card-blur: 40px;
+    --card-border: rgba(175, 125, 172, 0.15); 
+    --progress-bar-bg: rgba(175, 125, 172, 0.25); 
+    --progress-bar-fill: var(--c-salmon);
+    --progress-bar-bg1: rgba(242, 146, 110, 0.25); 
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* === Body & 3D 视差基础 === */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-image: 
+        radial-gradient(ellipse at 50% 0%, var(--c-dark-purple-alpha), var(--c-darkest-blue-alpha) 70%), 
+        url('img.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; 
+    color: var(--primary-text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+    perspective: 1500px; /* 3D 视距 */
+}
+
+/* === 1. 背景氛围层 (光斑/噪点/流星) === */
+/* ... (这部分样式和原来一样，保持不变) ... */
+.noise-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: -1; opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+    transition: opacity 0.5s ease;
+}
+.ambient-light {
+    position: absolute; border-radius: 50%; filter: blur(100px);
+    z-index: -2; opacity: 0.35; pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+.ambient-light.one {
+    width: 600px; height: 600px; background: var(--c-salmon);
+    top: -10%; left: -10%;
+    animation: floatFlowOne 12s infinite ease-in-out alternate;
+}
+.ambient-light.two {
+    width: 500px; height: 500px; background: #7B68EE;
+    bottom: -10%; right: -10%;
+    animation: floatFlowTwo 15s infinite ease-in-out alternate;
+}
+@keyframes floatFlowOne {
+    0% { transform: translate(0, 0) scale(1); border-radius: 50%; }
+    50% { transform: translate(50px, 30px) scale(1.1); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+    100% { transform: translate(-20px, 80px) scale(1); border-radius: 50%; }
+}
+@keyframes floatFlowTwo {
+    0% { transform: translate(0, 0) scale(1); border-radius: 50%; }
+    50% { transform: translate(-60px, -40px) scale(1.2); border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    100% { transform: translate(20px, -20px) scale(1); border-radius: 50%; }
+}
+.shooting-stars-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: -2; overflow: hidden;
+    transition: opacity 0.5s ease;
+}
+.shooting-star {
+    position: absolute; width: 4px; height: 4px;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255,255,255,0.7);
+    animation: shootStar 6s linear infinite; opacity: 0;
+    transform: rotateZ(35deg); filter: blur(0.5px);
+}
+@keyframes shootStar {
+    0% { transform: translate(-100vw, -100vh) rotateZ(35deg); opacity: 0; }
+    1% { opacity: 1; }
+    50% { opacity: 1; }
+    51% { opacity: 1; }
+    80% { opacity: 0; }
+    100% { transform: translate(100vw, 100vh) rotateZ(35deg); opacity: 0; }
+}
+
+/* === 2. 导航栏 (悬浮胶囊风格) === */
+/* ... (这部分样式和原来一样，保持不变) ... */
+.top-nav {
+    width: 100%; max-width: 1200px; display: flex; justify-content: space-between;
+    align-items: center; padding: 0 20px; position: absolute; top: 40px; left: 50%;
+    transform: translateX(-50%); z-index: 100;
+}
+.nav-capsule {
+    background: rgba(20, 20, 35, 0.4); padding: 12px 10px; border-radius: 60px;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); transition: all 0.3s ease;
+    position: relative;
+}
+.nav-capsule:hover {
+    background: rgba(30, 30, 50, 0.6); border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+.nav-capsule ul { list-style: none; display: flex; gap: 5px; }
+.top-nav a {
+    text-decoration: none; color: var(--secondary-text);
+    font-size: 14px; font-weight: 500; padding: 12px 24px; border-radius: 40px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
+    position: relative;
+    z-index: 2;
+}
+.top-nav a:not(.active):hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+.top-nav a.active {
+    color: #fff;
+    font-weight: 600;
+    background: none;
+    box-shadow: none;
+}
+.nav-pill {
+    position: absolute;
+    top: 6px;
+    height: calc(100% - 12px);
+    border-radius: 40px;
+    background: linear-gradient(135deg, var(--c-salmon), var(--c-lavender));
+    box-shadow: 0 4px 15px rgba(242, 146, 110, 0.4);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+.user-profile img {
+    width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.2); transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.user-profile img:hover {
+    transform: scale(1.1) rotate(5deg); border-color: var(--c-salmon);
+    box-shadow: 0 0 20px rgba(242, 146, 110, 0.5);
+}
+
+/* === 3. 主播放器卡片 === */
+.music-player {
+    position: relative; width: 90%; max-width: 1100px; height: 750px;
+    background: var(--card-bg); border-radius: 40px;
+    backdrop-filter: blur(var(--card-blur)); -webkit-backdrop-filter: blur(var(--card-blur));
+    border: 1px solid var(--card-border); padding: 50px 50px 10px 50px;
+    display: grid; grid-template-columns: 450px 1fr; grid-template-rows: 1fr auto;
+    grid-template-areas: "info lyrics" "controls controls";
+    gap: 30px; margin-top: 60px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    /* (修改) 移除 background 和 backdrop-filter 的过渡 */
+    transition: transform 0.1s ease-out; 
+    transform-style: preserve-3d; 
+    overflow: hidden;
+}
+/* ... (粒子特效样式 .card-particle-wrapper 等保持不变) ... */
+.card-particle-wrapper {
+    position: absolute;
+    opacity: 0;
+    animation: particleFlow 15s linear infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.card-particle-overlay {
+    --audio-pulse: 0;
+}
+.card-particle {
+    border-radius: 50%;
+    filter: blur(0.2px);
+    opacity: calc(var(--audio-pulse) * 0.6 + 0.6);
+    transform: scale(calc(var(--audio-pulse) * 0.2 + 0.9)); 
+    transition: opacity 0.1s, transform 0.1s; 
+}
+@keyframes particleFlow {
+    0% { 
+        transform: translate(0, 0); 
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% { 
+        transform: translate(var(--dx), var(--dy)); 
+        opacity: 0;
+    }
+}
+
+/* 歌曲信息 */
+.song-info { 
+    grid-area: info; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    
+    /* === (新增) 为 MV 切换添加过渡 === */
+    position: relative; 
+    z-index: 10; 
+    transition: opacity 0.5s ease;
+}
+/* (淡入淡出样式 .fade-out 保持不变) */
+.song-info h1, 
+.song-info .artist,
+.song-info .album-title {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.song-info .fade-out {
+    opacity: 0;
+    transform: translateY(10px);
+}
+/* ... (黑胶唱片 .vinyl-wrapper 等样式保持不变) ... */
+.vinyl-wrapper {
+    position: relative; width: 280px; height: 280px; margin-bottom: 40px;
+    display: flex; justify-content: center; align-items: center; margin-left: auto; margin-right: auto;
+}
+.vinyl-record {
+    width: 100%; height: 100%; border-radius: 50%; position: relative;
+    background: #080808; padding: 8px;
+    background-image: repeating-radial-gradient(#111 0, #111 2px, #222 3px, #222 4px);
+    box-shadow: 0 0 0 8px #080808, 0 10px 40px rgba(242, 146, 110, 0.3); 
+    animation: rotateRecord 10s linear infinite; animation-play-state: paused;
+}
+.vinyl-record.playing { animation-play-state: running; }
+.vinyl-record::before {
+    content: ''; position: absolute; top: 10%; left: 10%; right: 10%; bottom: 10%;
+    border-radius: 50%; background: var(--c-salmon); filter: blur(50px);
+    z-index: -1; opacity: 0.4; animation: breathingGlow 4s ease-in-out infinite alternate;
+}
+@keyframes breathingGlow {
+    0% { opacity: 0.3; transform: scale(0.9); filter: blur(40px); }
+    100% { opacity: 0.6; transform: scale(1.1); filter: blur(60px); }
+}
+.vinyl-sheen {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.1) 40%, transparent 50%);
+    z-index: 5; pointer-events: none;
+}
+.album-art { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #333; }
+@keyframes rotateRecord { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ... (文字流光 .song-info h1 等样式保持不变) ... */
+.song-info h1 { 
+    font-size: 32px; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; 
+    background: linear-gradient(120deg, #ffffff 0%, #f5dadf 20%, #f2926e 50%, #f5dadf 80%, #ffffff 100%);
+    background-size: 200% auto; color: transparent; -webkit-background-clip: text; background-clip: text;
+    animation: textShine 5s linear infinite;
+}
+@keyframes textShine { to { background-position: 200% center; } }
+.tag-quality {
+    font-size: 11px; vertical-align: middle; border: 1px solid var(--c-salmon); color: var(--c-salmon);
+    padding: 2px 6px; border-radius: 4px; margin-left: 12px; font-weight: 500; letter-spacing: 0.5px;
+    background: none; -webkit-text-fill-color: var(--c-salmon); 
+}
+.song-info .artist { font-size: 20px; color: var(--secondary-text); margin-bottom: 20px; }
+.artist-collab { 
+    font-size: 13px; color: var(--secondary-text); background: rgba(27, 48, 93, 0.2); 
+    padding: 10px 15px; border-radius: 10px; display: inline-block; max-width: 300px; 
+    display: none;
+}
+.artist-collab span { display: block; }
+.artist-collab span:first-child { color: var(--primary-text); margin-bottom: 5px; font-weight: 500; }
+.album-title {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 5px;
+    letter-spacing: 0.5px;
+}
+/* 歌词 */
+.lyrics-container {
+    grid-area: lyrics; 
+    position: relative; 
+    overflow: hidden;
+    perspective: 800px; 
+    perspective-origin: left center;
+    -webkit-mask-image: linear-gradient( to bottom, transparent 0%, black 20%, black 80%, transparent 100% );
+    mask-image: linear-gradient( to bottom, transparent 0%, black 20%, black 80%, transparent 100% );
+    cursor: grab;
+    z-index: 10; /* 已有 z-index: 10 */
+    
+    /* === (新增) 为 MV 切换添加过渡 === */
+    transition: opacity 0.5s ease;
+}
+.lyrics-container:active {
+    cursor: grabbing;
+}
+/* ... (歌词 .lyric-line 等所有剩余样式保持不变, 直到文件末尾) ... */
+.lyrics-list { list-style: none; width: 100%; height: 100%; transform-style: preserve-3d; }
+.lyric-line {
+    position: absolute; top: 50%; left: 0; width: 100%; max-width: 450px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: var(--secondary-text); font-size: 26px; font-weight: 500; opacity: 0;
+    transform-origin: 0% 50%;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.2s;
+    pointer-events: auto;
+}
+.lyric-line:hover {
+    color: var(--c-salmon);
+    text-shadow: 0 0 10px rgba(242, 146, 110, 0.5);
+}
+.lyric-line.active { 
+    color: var(--primary-text);
+    font-weight: bold; position: relative; z-index: 1;
+}
+.lyric-line.active::before {
+    content: ''; position: absolute; top: -5px; bottom: -5px; left: -10px; right: -10px;
+    background: linear-gradient(to right, rgba(242, 150, 110, 0.1), rgba(175, 125, 172, 0.05));
+    filter: blur(8px); border-radius: 8px; z-index: -1; opacity: 0.5;
+    animation: activeLyricGlow 3s ease-in-out infinite alternate;
+}
+@keyframes activeLyricGlow { 0% { opacity: 0.3; transform: scale(1); } 100% { opacity: 0.6; transform: scale(1.02); } }
+.lyric-timestamp {
+    position: absolute;
+    right: 100px;
+    top: 50%;
+    transform: translateY(-50%); 
+    font-size: 12px;      
+    font-weight: normal;  
+    color: rgba(255, 255, 255, 0.6);
+    opacity: 0;           
+    transition: opacity 0.3s ease; 
+    border-radius: 4px;
+    pointer-events: none; 
+}
+.lyric-line.active .lyric-timestamp {
+    opacity: 0;
+    color: rgba(255, 255, 255, 0.6);
+    text-shadow: 0 0 5px rgba(242, 146, 110, 0.3);
+}
+.lyrics-container.user-scrolling .lyric-line.active .lyric-timestamp {
+    opacity: 1;
+    color: var(--c-salmon); 
+    text-shadow: 0 0 8px rgba(242, 146, 110, 0.4);
+    transform: translateY(-50%) scale(1.1);
+}
+.lyric-line:hover .lyric-timestamp {
+    opacity: 0.8;
+    color: var(--c-salmon);
+}
+.lyric-line {
+    padding-right: 500px !important; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.controls { grid-area: controls; display: flex; flex-direction: column; }
+.music-visualizer {
+    display: flex; align-items: flex-end; justify-content: center;
+    width: 100%; height: 60px; margin-bottom: 20px; gap: 6px;
+}
+.music-visualizer .bar {
+    width: 6px; 
+    background: var(--c-salmon); 
+    border-radius: 5px; 
+    height: 5%;
+    transition: height 0.1s ease; 
+    opacity: 0.3; 
+}
+.music-visualizer.playing .bar {
+    opacity: 1;
+}
+.time-control { display: flex; align-items: center; gap: 15px; width: 100%; margin-bottom: 15px; }
+.time-control span { font-size: 12px; color: var(--secondary-text); min-width: 35px; text-align: center; }
+.progress-bar-container { flex-grow: 1; height: 5px; background: var(--progress-bar-bg); border-radius: 3px; cursor: pointer; }
+.progress-bar { 
+    height: 100%; background: linear-gradient(90deg, var(--c-lavender), var(--c-salmon));
+    border-radius: 3px; transition: width 0.1s linear; position: relative;
+    box-shadow: 0 0 10px var(--c-salmon);
+}
+.progress-bar::after {
+    content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
+    width: 12px; height: 12px; background: #fff; border-radius: 50%;
+    box-shadow: 0 0 15px 2px var(--c-salmon);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.progress-bar-container.seeking .progress-bar::after {
+    transform: translateY(-50%) scale(1.6);
+}
+.button-controls { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.left-buttons, .center-buttons, .right-buttons { display: flex; align-items: center; gap: 25px; flex-basis: 200px; }
+.left-buttons { justify-content: flex-start; } .right-buttons { justify-content: flex-end; flex-basis: 
+250px; gap: 15px;} .center-buttons { justify-content: center; flex-grow: 1; }
+.btn { background: none; border: none; color: var(--secondary-text); font-size: 18px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
+.btn img { width: 18px; height: 18px; vertical-align: middle; transition: all 0.2s ease; }
+.btn-large img { width: 24px; height: 24px; }
+.btn-play {
+    width: 50px; height: 50px; background: var(--progress-bar-fill); color: var(--bg-gradient-end);
+    border-radius: 50%; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); padding: 0;
+}
+.btn-play:hover { background: #f3a284; transform: scale(1.05); }
+.btn-play img { width: 20px; height: 20px; margin-left: 3px; filter: none;}
+.btn-play img[alt="Pause"] { margin-left: 0; }
+.volume-control-container { width: 100px;display: flex;         /* 1. 将其变为 flex 容器 */
+    align-items: center;   /* 2. 垂直居中它内部的滑动条 */
+    height: 18px;          /* 3. 使其高度与图标按钮一致 */ }
+input[type="range"].volume-slider {
+   -webkit-appearance: none;
+    appearance: none; width: 100%; height: 5px; border-radius: 3px; cursor: pointer; outline: none;
+    background: linear-gradient(to right, var(--progress-bar-fill) 100%, var(--progress-bar-bg) 100%);
+    box-shadow: 0 0 5px rgba(175, 125, 172, 0.3);
+}
+input[type="range"].volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 10px; height: 10px; background: var(--progress-bar-fill); border-radius: 50%;
+}
+.playlist-modal {
+    position: absolute; bottom: 110px; right: 40px; z-index: 20; width: 350px; height: 400px;
+    background: var(--card-bg); border-radius: 20px;
+    backdrop-filter: blur(var(--card-blur)); -webkit-backdrop-filter: blur(var(--card-blur));
+    border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.3s ease;
+    display: flex; flex-direction: column; overflow: hidden;
+}
+.playlist-modal.show { opacity: 1; visibility: visible; transform: translateY(0); }
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center; padding: 20px;
+    flex-shrink: 0; border-bottom: 1px solid var(--card-border);
+}
+.modal-header h3 { font-size: 18px; font-weight: 600; color: var(--primary-text); }
+.btn-close { font-size: 28px; font-weight: 300; color: var(--secondary-text); padding: 0; width: 30px; height: 30px; }
+.btn-close:hover { color: var(--primary-text); }
+.playlist-song-list { list-style: none; flex-grow: 1; overflow-y: auto; padding: 10px; }
+.playlist-song-list::-webkit-scrollbar { width: 6px; }
+.playlist-song-list::-webkit-scrollbar-thumb { background: var(--progress-bar-bg); border-radius: 3px; }
+.playlist-song-list li {
+    display: flex; align-items: center; padding: 12px 10px; border-radius: 8px; cursor: pointer; transition: background 0.2s ease;
+}
+.playlist-song-list li:hover { background: rgba(245, 218, 223, 0.1); }
+.playlist-song-list li.playing { background: rgba(242, 150, 142, 0.2); }
+.song-item-title { font-size: 15px; font-weight: 500; color: var(--primary-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;  }
+.song-item-artist { font-size: 13px; color: var(--secondary-text); margin-left: 8px; flex-shrink: 0; }
+.btn, .playlist-song-list li, .nav-capsule a {
+    position: relative;
+    overflow: hidden; 
+    z-index: 1; 
+}
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+#snowflake-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 100;
+    pointer-events: none;
+    overflow: hidden;
+}
+.mouse-snowflake {
+    position: absolute;
+    width: 4px; height: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    filter: blur(0.5px);
+    pointer-events: none;
+    animation: fallAndDrop 2s linear forwards; 
+}
+@keyframes fallAndDrop {
+    from {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: translate(var(--drift-x, 0px), var(--drift-y, 150px)) scale(0.2);
+        opacity: 0;
+    }
+}
+
+/* === 11. (修改) MV 模式样式 === */
+
+/* 1. MV 播放器的新位置 (在网格内) */
+#mv-player {
+    /* ... (grid-area, margin, width 保持不变) ... */
+    grid-area: 1 / 1 / 2 / 3;
+    margin: -50px -50px 0 -50px;
+    width: calc(100% + 100px);
+
+    /* === (2. 修正) 修复 MV 高度 === */
+    /*
+      原高度: calc(100% + 50px); (丢失了 30px 的 gap)
+      新高度: 100% (1fr) + 50px (顶部 padding) + 30px (grid-gap)
+    */
+    height: calc(100% +250px);
+    border-radius: 40px;
+
+    
+    /* ... (opacity, z-index, transition 等保持不变) ... */
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1; 
+    transition: opacity 0.5s ease;
+    overflow: hidden;
+    object-fit: cover; /* (确保 object-fit 存在) */
+}
+
+/* 2. 当 MV 模式激活时 (.mv-mode 添加到 .music-player) */
+.music-player.mv-mode #mv-player {
+    opacity: 1;
+    visibility: visible;
+}
+
+.music-player.mv-mode .song-info,
+.music-player.mv-mode .lyrics-container {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; /* 隐藏后使其不可点击 */
+}
+
+/* 3. MV 按钮的激活样式 (保持不变) */
+#btn-mv.active img {
+    /* 添加辉光效果 */
+    filter: drop-shadow(0 0 8px var(--c-salmon));
+    transform: scale(1.1);
+}
+/* === (新增) 12. 播放列表拖拽排序样式 === */
+
+/* 1. 提示用户列表项可以拖拽 */
+.playlist-song-list li {
+    cursor: grab; /* 鼠标悬停时显示“抓取”手势 */
+}
+
+/* 2. 项目正在被拖拽时的样式 */
+.playlist-song-list li.dragging {
+    cursor: grabbing; /* 拖拽时显示“抓紧”手势 */
+    opacity: 0.5;
+    background: rgba(245, 218, 223, 0.1); /* 拖拽时轻微高亮 */
+}
+
+/* 3. 拖拽到某个项目“上方”时的样式 */
+.playlist-song-list li.drag-over {
+    /* 在项目顶部显示一条线，指示释放后将插入到此处 */
+    border-top: 2px solid var(--c-salmon);
+    /* (可选) 稍微平移，为线条腾出空间 */
+    transform: translateY(2px);
+}
+/* === 13. (NEW) 播放列表 "正在播放" 动画 === */
+
+/* 1. 移除旧的背景高亮 */
+.playlist-song-list li.playing {
+    background: none; /* 移除背景色 */
+}
+
+/* 2. 让 li 变成 flex 容器来对齐图标和文字 
+   (注意: 如果您在 `style.css` 的 520 行左右已经有了
+    .playlist-song-list li { ... } 规则，
+    请确保它包含 `display: flex;` 和 `align-items: center;`)
+*/
+.playlist-song-list li {
+    display: flex;
+    align-items: center;
+    /* (您已有的 padding, border-radius 等样式会保持不变) */
+}
+
+/* 3. 动画图标容器 */
+.playing-icon-container {
+    width: 16px;  /* 图标宽度 */
+    height: 16px; /* 图标高度 */
+    display: flex;
+    align-items: flex-end; /* 让 bar 从底部开始对齐 */
+    justify-content: space-between;
+    margin-left: 12px; /* 图标和文字的间距 */
+    flex-shrink: 0; /* 防止容器在 flex 布局中被压缩 */
+}
+
+/* 4. 动画 bar (单个竖条) */
+.playing-bar {
+    width: 3px; /* 每个 bar 的宽度 */
+    height: 100%; /* 默认占满 (将在动画中被覆盖) */
+    background: var(--c-salmon); /* 使用您的主题色 */
+    border-radius: 2px;
+    
+    /* 关键: 绑定动画 */
+    animation-name: playlist-playing-bar;
+    animation-duration: 1.2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    
+    /* 默认设为暂停, 等待 JS 启动 */
+    animation-play-state: paused; 
+}
+
+/* 5. 错开动画延迟, 营造跳动感 */
+.playing-bar:nth-child(1) {
+    animation-delay: 0s;
+}
+.playing-bar:nth-child(2) {
+    animation-delay: -0.2s; /* 提前 0.2s 开始 */
+}
+.playing-bar:nth-child(3) {
+    animation-delay: -0.4s; /* 提前 0.4s 开始 */
+}
+
+/* 6. 动画关键帧 (高度在 20% 和 100% 之间跳动) */
+@keyframes playlist-playing-bar {
+    0%   { height: 20%; }
+    50%  { height: 100%; }
+    100% { height: 20%; }
+}
+.song-title-wrapper {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;  /* 让这个 wrapper 占据所有可用空间 */
+    flex-shrink: 1; /* 允许它在空间不足时收缩 */
+    overflow: hidden; /* 关键: 隐藏过长的歌名 */
+}
+/* === 收藏按钮“怦然心动”特效 === */
+
+/* 1. 定义弹性动画关键帧 */
+@keyframes heartBounce {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(0.8); } /* 先缩小蓄力 */
+    50%  { transform: scale(1.3); } /* 猛烈放大 */
+    70%  { transform: scale(1.1); }
+    100% { transform: scale(1); }   /* 回复原状 */
+}
+
+/* 2. 应用到激活状态的图标 */
+/* 注意：JS 里我们已经写了当收藏时会给 button 加上 .active 类 */
+#btn-favorite.active img {
+    animation: heartBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 0 5px rgba(242, 146, 110, 0.6)); /* 添加发光 */
+}
+
+/* 3. (进阶) 粒子光环效果 - 使用伪元素 */
+#btn-favorite {
+    position: relative; /* 确保定位准确 */
+    overflow: visible;  /* 允许光环超出按钮范围 */
+}
+
+#btn-favorite.active::before,
+#btn-favorite.active::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none; /* 不影响点击 */
+    z-index: -1;
+}
+
+/* 第一层光环：实心扩散 */
+#btn-favorite.active::before {
+    background: rgba(242, 146, 110, 0.4);
+    animation: ripple-out 0.6s ease-out;
+}
+
+/* 第二层光环：描边扩散 */
+#btn-favorite.active::after {
+    border: 2px solid rgba(242, 146, 110, 0.6);
+    animation: ripple-out-stroke 0.6s ease-out 0.1s; /* 延迟一点点 */
+}
+
+/* 定义光环动画 */
+@keyframes ripple-out {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+@keyframes ripple-out-stroke {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
