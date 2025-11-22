@@ -1943,3 +1943,6 @@ body.dark-mode .shooting-stars-container {
     visibility: hidden;  /* 这里的 hidden 配合 transition 可以做淡出效果 */
     display: none;       /* 强制不渲染，彻底节省性能（推荐） */
 }
+html {
+    scroll-behavior: smooth;
+}

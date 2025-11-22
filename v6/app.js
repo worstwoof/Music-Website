@@ -404,7 +404,7 @@ function initCarouselInteraction(element, radius) {
     let animationId = null;
     
     // 自动播放速度
-    const autoRotateSpeed = -0.08; 
+    const autoRotateSpeed = -0.2; 
 
     // === 1. 获取所有卡片并计算基础角度 ===
     const items = element.querySelectorAll('.mv-item');
