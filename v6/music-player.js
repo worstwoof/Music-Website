@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let lyricsData = []; 
     let currentLyricDataIndex = -1; 
     let draggedItemId = null; 
-
+    let lastMessageTime = 0;
     // === (新增) Iframe 通信变量 ===
     const IS_IN_IFRAME = (window.self !== window.top);
     const parentOrigin = '*'; // 为安全起见, 生产环境应设为父页面的域名
@@ -837,40 +837,40 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             if(particleContainer) particleContainer.style.setProperty('--audio-pulse', 0);
             
-            // [新增] 通知主页音乐停止，亮度归零
-            if (IS_IN_IFRAME) {
+            // 停止时，也稍微节流一下发送归零信号，避免疯狂发送
+            const now = Date.now();
+            if (now - lastMessageTime > 200 && IS_IN_IFRAME) {
                 window.parent.postMessage({ type: 'audioVisualizerData', amplitude: 0 }, parentOrigin);
+                lastMessageTime = now;
             }
             return;
         }
 
         analyser.getByteFrequencyData(dataArray);
         
-        // 1. 计算低音部分的平均音量 (用于律动)
+        // 1. 计算低音部分的平均音量
         let bassSum = 0; 
-        const bassBins = 8; // 取前8个频段作为低音
+        const bassBins = 8; 
         for (let i = 0; i < bassBins; i++) bassSum += dataArray[i];
         let average = bassSum / bassBins; 
         
-        // 2. 归一化振幅 (0.0 ~ 1.0)，并乘以当前音量
-        // audio.volume 是 0~1，这样静音时星星也不会闪
+        // 2. 计算振幅
         let amplitude = (average / 255) * audio.volume; 
 
-        // [新增] 实时发送律动数据给主页 (app.js)
-        if (IS_IN_IFRAME) {
-            // 为了性能，我们可以稍微限制一下发送频率，或者直接发送（现代浏览器通常能处理）
-            window.parent.postMessage({ type: 'audioVisualizerData', amplitude: amplitude }, parentOrigin);
+        // === 【修复点】节流发送数据给主页 ===
+        // 只有当距离上次发送超过 50ms (约20帧/秒) 时才发送，既流畅又不卡顿
+        const now = Date.now();
+        if (now - lastMessageTime > 50) { 
+            if (IS_IN_IFRAME) {
+                window.parent.postMessage({ 
+                    type: 'audioVisualizerData', 
+                    amplitude: amplitude 
+                }, parentOrigin);
+            }
+            lastMessageTime = now; // 更新时间戳
         }
-            const now = Date.now();
-                if (now - lastMessageTime > 100) { 
-                    if (IS_IN_IFRAME) {
-                        window.parent.postMessage({ 
-                            type: 'audioVisualizerData', 
-                            amplitude: amplitude 
-                        }, parentOrigin);
-                    }
-                    lastMessageTime = now;
-                }
+        // ====================================
+
         // --- 原有的柱状图渲染逻辑 ---
         const center = 14.5; 
         visualizerBars.forEach((bar, i) => {
