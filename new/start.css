@@ -109,6 +109,13 @@ body {
 }
 
 /* 第一页内容 */
+.welcome-logo {
+    width: 400px;
+    margin-bottom: 20px;
+    animation: fadeInLeft 1s ease-out forwards;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+    opacity: 0;
+}
 .welcome-content {
     position: relative;
     z-index: 10;

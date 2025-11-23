@@ -66,7 +66,7 @@ window.addEventListener('wheel', (e) => {
 
 // 跳转到播放器
 function goToPlayer() {
-    window.location.href = 'next.html';
+    window.location.href = 'index.html';
 }
 // 光标跟随流光按钮效果
 let ctaBtn = document.querySelector('.cta-button');
