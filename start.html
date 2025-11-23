@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>云音乐播放器</title>
+    <title>♪星乐♪</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-   <link rel="stylesheet" href="style.css">
+   <link rel="stylesheet" href="start.css">
 </head>
 <body>
-     <div id="snowflake-canvas"></div>
     <div class="page-container" id="pageContainer">
         <!-- 第一页：欢迎页-->
         <div class="page" id="page1">
@@ -129,11 +128,11 @@
 
         <!-- 第四页：我的收藏 -->
         <div class="page" id="page4">
-            <div class="flower flower-top-left" id="flowerTopLeft"></div>
-            <div class="flower flower-top-right" id="flowerTopRight"></div>
-            <div class="flower flower-bottom-left" id="flowerBottomLeft"></div>
-            <div class="flower flower-bottom-right" id="flowerBottomRight"></div>
-
+            <!-- 添加精灵图 -->
+             <div class="sprite dogLove"></div>
+             <div class="sprite listen"></div>
+             <div class="sprite congratulate"></div>
+             
             <div class="feature-content">
                 <div class="feature-left">
                     <div class="feature-icon">
@@ -181,7 +180,7 @@
         <div class="page-dot" onclick="scrollToPage(4)"></div>
     </div>
 
-   <script src="function.js"></script>
-   <script src="mouse-trail.js"></script> 
+   <script src="start.js"></script>
+   <script src="start-mouseTrail.js"></script> 
 </body>
 </html>
