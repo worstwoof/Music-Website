@@ -1,3 +1,30 @@
+<div align="center">
+  <img src="https://img.shields.io/badge/Space-Music-423B63?style=for-the-badge&logo=applemusic&logoColor=white&labelColor=1B305D" alt="Space Music Logo" />
+  
+  <h1 style="font-family: 'Orbitron', sans-serif;">🌌 星乐 Space Music </h1>
+  
+  <p>
+    <strong>基于 Web Audio API 与 CSS3D 的沉浸式视听音乐空间</strong>
+  </p >
+
+  <p>
+    <!-- 核心技术 -->
+    <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" />
+    <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white" />
+    <img src="https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat-square&logo=javascript&logoColor=black" />
+    <img src="https://img.shields.io/badge/Node.js-Build_Script-339933?style=flat-square&logo=node.js&logoColor=white" />
+    <br/>
+    <!-- 视觉与动画 -->
+    <img src="https://img.shields.io/badge/Three.js-Vanta_Background-000000?style=flat-square&logo=three.js&logoColor=white" />
+    <img src="https://img.shields.io/badge/GSAP-Animations-88CE02?style=flat-square&logo=greensock&logoColor=white" />
+    <img src="https://img.shields.io/badge/Swiper-3D_Flow-6332F6?style=flat-square&logo=swiper&logoColor=white" />
+    <!-- 核心API -->
+    <img src="https://img.shields.io/badge/Web_Audio_API-Visualizer-FF69B4?style=flat-square&logo=shazam&logoColor=white" />
+    <img src="https://img.shields.io/badge/View_Transitions_API-SPA-4285F4?style=flat-square" />
+  </p >
+</div>
+
+---
 # 🎵 星乐 (Space Music) - 沉浸式音乐世界
 
 欢迎来到“星乐”，一个功能丰富、视觉效果惊艳的现代音乐 Web 应用程序。
@@ -9,7 +36,15 @@
 3.  **音乐播放器 ( `music-player.html`)**: 一个功能齐全的用户中心和具有音视频(MV)双核同步功能的沉浸式播放器。
 
 ---
+# 👥 开发团队 (Development Team)
+组长: 张渠美 (音乐中心功能、页面设计、报告撰写)
+成员:
+* 黄子豪 (播放界面功能、页面设计、界面整合)
+* 张天译 (首页功能、页面设计、演示视频录制)
+* 文 旺 (首页功能、页面设计、后期润色)
+* 宁 娟 (引导页动画设计、Logo设计、报告撰写
 
+---
 ## 🌟 项目一览 (Project Showcase)
 
 | 引导页 (Start Page) | 引导页 - 功能介绍 |
@@ -91,6 +126,19 @@
     * 用户可以在播放列表弹窗中通过 **Drag and Drop API** 随意拖拽歌曲，以调整播放顺序。 `上一首/下一首` 按钮会严格遵循用户自定义的新顺序。
 
 ---
+## ⚡ 性能优化策略 (Optimization)
+为了确保在富动画环境下的流畅体验，我们实施了以下优化：
+
+* **渲染性能:**
+对高频动画元素（如蝴蝶、流星）使用 will-change: transform 启用 GPU 硬件加速。
+使用 backface-visibility: hidden 修复 3D 旋转时的闪烁问题。
+CSS 属性使用 contain: layout style paint 减少重绘区域。
+* **资源管理:**
+按需生成: 粒子特效仅在当前可见的 Slide 中生成，离开页面自动销毁 DOM 节点，防止内存泄漏。
+* **事件节流:**
+滚动监听 (wheel) 使用 { passive: true } 提升滚动性能。
+对高频触发事件（如可视化数据传输）进行防抖处理，降低 postMessage 通信频率。
+---
 
 ## 🛠️ 技术栈 (Technology Stack)
 
@@ -116,84 +164,73 @@
     * Google Fonts
 
 ---
+## 🚀 快速启动 (How to Run)
 
-## 🚀 如何运行
+由于本项目使用了 `Web Audio API` (音频分析) 和 `fetch API` (加载配置)，受浏览器安全策略限制，**无法直接双击 HTML 文件运行**。请按照以下步骤启动：
 
-### 依赖
-您必须在您的电脑上安装 **Node.js** (安装 LTS 版本即可)。
+### 1. 环境准备
+确保你的电脑已安装 [Node.js](https://nodejs.org/) (用于生成播放列表) 和 [VS Code](https://code.visualstudio.com/)。
 
-### 1. 添加歌曲（关键步骤）
+### 2. 生成播放列表 (首次运行必需)
+打开项目根目录的终端，运行构建脚本，这将扫描本地音乐并生成 `playlist.json`：
+```bash
+node build-playlist.js
+```
+> *看到 "✅ 成功生成 playlist.json！" 即表示成功。*
 
-本项目通过 Node.js 脚本动态管理歌曲列表，您**无需**手动编辑任何 JSON 或 HTML 列表。
+### 3. 启动服务器
+推荐使用 VS Code 的 **Live Server** 插件：
+1.  在 VS Code 中安装插件：`Live Server`。
+2.  鼠标右键点击 `start.html` (引导页) 或 `index.html` (主页)。
+3.  选择 **"Open with Live Server"**。
+4.  浏览器将自动打开，尽情享受音乐吧！🎵
 
-**第一步：准备歌曲文件夹**
+---
 
-在项目根目录中找到 `songs/` 文件夹。您需要为您想添加的**每一首**歌曲创建一个单独的文件夹。
+## 📂 如何上传音乐与 MV (Upload Guide)
 
-例如，要添加“泡沫”这首歌，您应该创建 `songs/paomo/` 文件夹。
+本项目采用**"文件即数据"**的自动化管理方式。你不需要写代码，只需按规则放入文件即可。
 
-**第二步：在文件夹中添加资源**
+### 1. 创建文件夹
+在 `songs/` 目录下，为你想要的每一首歌创建一个**单独的文件夹**（文件夹名最好是英文或拼音，如 `songs/paomo/`）。
 
-将所有相关资源放入您刚创建的文件夹 (`songs/paomo/`) 中：
+### 2. 放入资源文件
+将你的音频、图片、MV 放入刚才创建的文件夹中：
+*   🎵 **音频文件** (必需): 支持 `.mp3`, `.flac`。
+*   🖼️ **封面图片** (必需): 推荐命名为 `cover.jpg`。
+*   🎬 **MV 视频** (可选): 推荐命名为 `video.mp4`。
+*   📝 **歌词文件** (可选): 推荐命名为 `lyrics.lrc`。
 
-1.  **`info.json` (必需)**: 包含歌曲信息的 JSON 文件。
-2.  **音频文件 (必需)**: 例如 `G.E.M.邓紫棋-泡沫.flac` 或 `audio.mp3`。
-3.  **`cover.jpg` (必需)**: 歌曲封面图。
-4.  **`lyrics.lrc` (可选)**: 歌词文件。
-5.  **`video.mp4` (可选)**: MV 视频文件。
-
-**第三步：配置 `info.json` 文件**
-
-这是最关键的一步。`info.json` 文件必须严格遵循以下格式，**文件名必须与您放入文件夹中的文件名完全一致**：
+### 3. 配置 info.json (关键)
+在文件夹内新建一个 `info.json` 文件，填入以下内容（确保文件名完全匹配）：
 
 ```json
 {
-  "title": "泡沫",
-  "artist": "G.E.M.邓紫棋",
-  "album": "Xposed",
-  "audio": "G.E.M.邓紫棋-泡沫.flac",
-  "mv": "video.mp4"
+  "title": "歌曲标题",
+  "artist": "歌手名字",
+  "album": "专辑名称",
+  "audio": "你的音频文件名.mp3", 
+  "cover": "cover.jpg",
+  "mv": "video.mp4" 
 }
 ```
-"audio": 必须匹配您的音频文件名 (如 .flac, .mp3)。
+> *注意：如果这首歌没有 MV，请直接删除 `"mv"` 这一行。*
 
-"mv": 必须匹配您的视频文件名 (如 .mp4)。如果这首歌没有 MV，请将这行删除。
-
-
-**第四步：运行脚本**
-
-
-在项目根目录打开终端，运行：
-
-```Bash
-
+### 4. 刷新列表
+每当你添加或删除了歌曲后，都需要**重新执行一次步骤 2 中的命令**来更新播放列表：
+```bash
 node build-playlist.js
 ```
+刷新浏览器，你的新歌就会出现在列表中了！✨
 
-**第五步：检查结果**
+
+### 第五步：检查结果
 
 
 脚本会自动扫描 songs/ 目录下的所有子文件夹，读取它们的 info.json，然后生成（或更新）一个 playlist.json 文件。
 
 您每次添加或删除歌曲文件夹时，都需要重复第四步来刷新列表。
 
-
-**启动项目**
-
-
-由于本项目使用 fetch API 异步加载 playlist.json 和 .lrc 文件，您不能直接通过双击 start.html (即 file:/// 协议) 运行。
-
-您必须使用一个本地服务器。
-
-推荐方式 (VS Code):
-
-在 VS Code 中打开项目文件夹。
-
-安装 Live Server 插件。
-
-在 start.html (引导页) 或 homepage.html (主页) 文件上右键，选择 Open with Live Server。
-
-浏览器将自动打开并运行项目。
 ```
 📁 文件结构 (简)
 .
