@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G.E.M. 邓紫棋 - 播放器</title>
+    <title>星乐播放器</title>
     <link rel="stylesheet" href="music-player.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
 </head>
@@ -22,7 +22,7 @@
         
         <div class="card-particle-overlay"></div>
 
-        <video id="mv-player" loop muted playsinline></video>
+        <video id="mv-player" preload="metadata" muted playsinline></video>
 
         <section class="song-info">
             <div class="vinyl-wrapper">
@@ -32,9 +32,9 @@
                 <div class="vinyl-sheen"></div>
             </div>
 
-            <h1>泡沫 <span class="tag-quality">Hi-Res</span></h1>
+            <h1>正在加载曲库</h1>
             
-            <p class="artist">G.E.M.邓紫棋</p>
+            <p class="artist"></p>
             <p class="album-title"></p>
         </section>
 
@@ -111,7 +111,9 @@
         <ul class="playlist-song-list" id="playlist-song-list"></ul>
     </div>
 
-    <audio id="audio-player" src="" crossorigin="anonymous"></audio>
+    <audio id="audio-player" preload="metadata" crossorigin="anonymous"></audio>
+    <p id="player-notice" class="player-notice" role="status" hidden></p>
+    <script src="storage.js"></script>
     <script src="music-player.js"></script>
 </body>
 </html>

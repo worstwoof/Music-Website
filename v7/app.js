@@ -1,336 +1,5 @@
-// =======================================
-// app.js - 修复版 UserSystem
-// =======================================
-
-const UserSystem = {
-  guestUser: {
-    isLoggedIn: false,
-    loginId: null,
-    username: "访客",
-    bio: "登录后体验更多功能",
-    avatar: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
-    email: "未绑定",
-  },
-
-  currentUser: {},
-
-  init() {
-    this.loadSession();
-    this.bindEvents();
-    this.updateUI(); // 初始化时刷新 UI
-
-    // 延迟一下同步给 Iframe，防止 Iframe 还没加载完
-    setTimeout(() => this.syncToIframe(), 1000);
-  },
-
-  // 1. 加载会话 (每次刷新页面时调用)
-  loadSession() {
-    const session = localStorage.getItem("music_current_session");
-    if (session) {
-      this.currentUser = JSON.parse(session);
-
-      // [关键修复] 为了防止会话数据过期，重新从数据库读取一次最新资料
-      if (this.currentUser.isLoggedIn && this.currentUser.loginId) {
-        const dbUser = this.getUserFromDB(this.currentUser.loginId);
-        // 合并数据：保持登录状态，但更新资料
-        this.currentUser = { ...this.currentUser, ...dbUser };
-        // 更新回会话缓存
-        localStorage.setItem(
-          "music_current_session",
-          JSON.stringify(this.currentUser)
-        );
-      }
-    } else {
-      this.currentUser = { ...this.guestUser };
-    }
-  },
-
-  // 2. 保存会话并同步 (每次修改资料后调用)
-  saveSession() {
-    localStorage.setItem(
-      "music_current_session",
-      JSON.stringify(this.currentUser)
-    );
-    this.updateUI(); // 刷新主页 UI
-    this.syncToIframe(); // 刷新播放器 UI
-  },
-
-  // 获取数据库数据
-  getUserFromDB(loginId) {
-    const db = JSON.parse(localStorage.getItem("music_users_db") || "{}");
-    if (db[loginId]) return db[loginId];
-
-    // 默认数据
-    const defaultUser = {
-      username: "DOGE",
-      bio: "超级音乐发烧友",
-      avatar:
-        "https://th.bing.com/th/id/OIP.oFazgA0xj09WmTqa4k3nRAAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3",
-      email: "doge@music.com",
-      password: "123456",
-    };
-    // 写入数据库
-    db[loginId] = defaultUser;
-    localStorage.setItem("music_users_db", JSON.stringify(db));
-    return defaultUser;
-  },
-
-  // 更新数据库
-  updateUserToDB(loginId, newData) {
-    const db = JSON.parse(localStorage.getItem("music_users_db") || "{}");
-    if (!db[loginId]) return;
-    db[loginId] = { ...db[loginId], ...newData };
-    localStorage.setItem("music_users_db", JSON.stringify(db));
-  },
-
-  // 删除账户
-  deleteUserFromDB(loginId) {
-    const db = JSON.parse(localStorage.getItem("music_users_db") || "{}");
-    delete db[loginId];
-    localStorage.setItem("music_users_db", JSON.stringify(db));
-  },
-
-  // 登录
-  login(username, password) {
-    const userInDB = this.getUserFromDB(username);
-    if (userInDB && String(userInDB.password) === String(password)) {
-      this.currentUser = { isLoggedIn: true, loginId: username, ...userInDB };
-      this.saveSession();
-      return { success: true };
-    }
-    // 后门逻辑
-    if (username === "admin" && password === "123456") {
-      return this.login(username, password);
-    }
-    return { success: false, msg: "账号或密码错误" };
-  },
-
-  // 退出
-  logout() {
-    this.currentUser = { ...this.guestUser };
-    this.saveSession();
-    // 回到首页
-    const myMusicView = document.getElementById("view-mymusic");
-    if (myMusicView && myMusicView.classList.contains("active")) {
-      document.querySelector('.nav-item[data-page="home"]')?.click();
-    }
-    showToast("已安全退出");
-  },
-
-  // [核心修复] 更新资料逻辑
-  updateProfile(name, bio, avatarUrl) {
-    if (!this.currentUser.isLoggedIn) return;
-
-    // 1. 更新内存对象
-    this.currentUser.username = name;
-    this.currentUser.bio = bio;
-    this.currentUser.avatar = avatarUrl; // 确保这里拿到的是最新的图片地址(包括Base64)
-
-    // 2. 更新数据库 (永久存储)
-    this.updateUserToDB(this.currentUser.loginId, {
-      username: name,
-      bio: bio,
-      avatar: avatarUrl,
-    });
-
-    // 3. 更新会话 (当前状态 + 触发同步)
-    this.saveSession();
-  },
-
-  // UI 刷新 (主页)
-  updateUI() {
-    const user = this.currentUser;
-
-    // Header
-    const loginBtn = document.getElementById("showLoginBtn");
-    const userContainer = document.getElementById("headerUserContainer");
-    const headerAvatar = document.getElementById("headerUserAvatar");
-
-    if (user.isLoggedIn) {
-      if (loginBtn) loginBtn.style.display = "none";
-      if (userContainer) userContainer.style.display = "flex";
-      if (headerAvatar) headerAvatar.src = user.avatar;
-    } else {
-      if (loginBtn) loginBtn.style.display = "block";
-      if (userContainer) userContainer.style.display = "none";
-    }
-
-    // Sidebar
-    const sidebarName = document.querySelector(".music-sidebar .profile h2");
-    const sidebarBio = document.querySelector(".music-sidebar .profile p");
-    const sidebarImg = document.querySelector(".music-sidebar .profile-img");
-    if (sidebarName) sidebarName.textContent = user.username;
-    if (sidebarBio) sidebarBio.textContent = user.bio;
-    if (sidebarImg) sidebarImg.src = user.avatar;
-
-    // Edit Form
-    const inputName = document.getElementById("editUsername");
-    const inputBio = document.getElementById("editBio");
-    const previewName = document.getElementById("previewNameDisplay");
-    const previewAvatar = document.querySelector(".preview-avatar");
-    const emailDisplay = document.getElementById("displayEmail");
-
-    if (inputName) inputName.value = user.username;
-    if (inputBio) inputBio.value = user.bio;
-    if (previewName) previewName.textContent = user.username;
-    if (previewAvatar) previewAvatar.src = user.avatar;
-    if (emailDisplay)
-      emailDisplay.textContent = user.isLoggedIn
-        ? `绑定邮箱: ${user.email}`
-        : "绑定邮箱: ---";
-
-    // Highlight Avatar
-    document.querySelectorAll(".avatar-option-edit").forEach((img) => {
-      if (img.src === user.avatar) img.classList.add("selected");
-      else img.classList.remove("selected");
-    });
-  },
-
-  // [核心修复] 同步给 Iframe (播放器)
-  syncToIframe() {
-    const playerIframe = document.getElementById("player-iframe");
-    if (playerIframe && playerIframe.contentWindow) {
-      // 发送特定的消息类型
-      playerIframe.contentWindow.postMessage(
-        {
-          type: "updateUserProfile",
-          profile: {
-            avatar: this.currentUser.avatar,
-            username: this.currentUser.username,
-          },
-        },
-        "*"
-      );
-      console.log("[App] 已发送资料同步指令给播放器", this.currentUser.avatar);
-    }
-  },
-
-  // 事件绑定
-  bindEvents() {
-    // 登录表单
-    const loginForm = document.getElementById("loginForm");
-    if (loginForm) {
-      loginForm.onsubmit = (e) => {
-        e.preventDefault();
-        const userIn = document.getElementById("loginUsernameInput").value;
-        const passIn = document.getElementById("loginPasswordInput").value;
-        const result = this.login(userIn, passIn);
-        if (result.success) {
-          showToast(`欢迎回来，${this.currentUser.username}`);
-          document.getElementById("closeLoginBtn").click();
-          loginForm.reset();
-        } else {
-          alert(result.msg);
-        }
-      };
-    }
-
-    // [核心修复] 保存按钮
-    const saveBtn = document.getElementById("saveProfileInPage");
-    if (saveBtn) {
-      saveBtn.onclick = () => {
-        if (!this.currentUser.isLoggedIn) return alert("请先登录！");
-
-        const name = document.getElementById("editUsername").value;
-        const bio = document.getElementById("editBio").value;
-        // 获取当前预览图的 src (这就是用户最终选择的头像，无论是点的还是上传的)
-        const currentPreviewSrc = document.querySelector(".preview-avatar").src;
-
-        // 调用更新函数
-        this.updateProfile(name, bio, currentPreviewSrc);
-        showToast("个人资料已保存并同步");
-      };
-    }
-
-    // 头像选择
-    document.querySelectorAll(".avatar-option-edit").forEach((img) => {
-      img.onclick = function () {
-        document
-          .querySelectorAll(".avatar-option-edit")
-          .forEach((i) => i.classList.remove("selected"));
-        this.classList.add("selected");
-        document.querySelector(".preview-avatar").src = this.src;
-      };
-    });
-
-    // 本地上传
-    const uploadBtn = document.getElementById("triggerUploadBtn");
-    const fileInput = document.getElementById("localAvatarInput");
-    if (uploadBtn && fileInput) {
-      uploadBtn.onclick = () => fileInput.click();
-      fileInput.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (ev) => {
-            // 只更新预览，不自动保存，等待用户点击保存按钮
-            document.querySelector(".preview-avatar").src = ev.target.result;
-            document
-              .querySelectorAll(".avatar-option-edit")
-              .forEach((i) => i.classList.remove("selected"));
-          };
-          reader.readAsDataURL(file);
-        }
-      };
-    }
-
-    // 其他按钮 (注销、改密等)
-    const actions = {
-      headerToMyMusic: () =>
-        document.querySelector('.nav-item[data-page="mymusic"]')?.click(),
-      headerLogout: () => this.logout(),
-      headerEditProfile: () => {
-        document.querySelector('.nav-item[data-page="mymusic"]')?.click();
-        setTimeout(
-          () =>
-            document
-              .querySelector('.nav-item-music[data-tab="edit-profile"]')
-              ?.click(),
-          100
-        );
-      },
-      btnChangeEmail: () => {
-        if (this.currentUser.isLoggedIn) {
-          const e = prompt("新邮箱:", this.currentUser.email);
-          if (e) {
-            this.currentUser.email = e;
-            this.updateUserToDB(this.currentUser.loginId, { email: e });
-            this.saveSession();
-            showToast("邮箱已修改");
-          }
-        }
-      },
-      btnChangePassword: () => {
-        if (this.currentUser.isLoggedIn) {
-          const p = prompt("新密码:");
-          if (p && p.length >= 6) {
-            this.updateUserToDB(this.currentUser.loginId, { password: p });
-            alert("密码已改，请重登");
-            this.logout();
-          } else if (p) alert("密码太短");
-        }
-      },
-      btnDeleteAccount: () => {
-        if (!this.currentUser.isLoggedIn) return;
-        const t = this.currentUser.loginId;
-        if (
-          confirm("确认注销账户？无法恢复！") &&
-          prompt(`输入登录账号【${t}】确认:`)?.trim() === t
-        ) {
-          this.deleteUserFromDB(t);
-          this.logout();
-          alert("已注销");
-        }
-      },
-    };
-    Object.keys(actions).forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.onclick = actions[id];
-    });
-  },
-};
-
 function initTiltEffects() {
+  if (typeof VanillaTilt === "undefined") return;
   // 移除旧的手写逻辑
 
   // 启用 Vanilla-tilt
@@ -349,7 +18,7 @@ function initTiltEffects() {
 }
 // app.js
 // =======================================
-// 新增功能：3D 环形 MV 墙渲染逻辑
+// 3D 环形 MV 墙
 // =======================================
 
 /**
@@ -511,7 +180,6 @@ function initCarouselInteraction(element, radius) {
 
   loop();
 
-  // --- 鼠标/触摸交互逻辑 (保持不变) ---
   const onDown = (x) => {
     isDown = true;
     startX = x;
@@ -570,13 +238,22 @@ function initCarouselInteraction(element, radius) {
   });
 }
 
-// 记得在 DOMContentLoaded 里调用 initFluidEffect();
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("[APP] 启动中...");
 
   // =======================================
   // 1. 全局变量与状态
   // =======================================
+  const playerIframe = document.getElementById("player-iframe");
+  let playerReady = false;
+  let playerLoadFailed = false;
+  let pendingPlay = null;
+
+  function isPlayerMessage(event) {
+    return event.origin === window.location.origin &&
+      event.source === playerIframe.contentWindow;
+  }
+
   let allSongsCache = [];
   let favoritesCache = [];
   let recentlyPlayedCache = [];
@@ -655,7 +332,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         movePill(homeNav);
       }
 
-      // === 【核心修复代码在这里】 ===
       // 当切换回首页时，强制 Vanta 重新调整大小
       if (vantaEffect) {
         // 使用 setTimeout 给浏览器一点时间完成渲染（从 display:none 变成 block）
@@ -716,14 +392,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 主题切换
   const themeToggleBtn = document.getElementById("theme-toggle-btn");
   if (themeToggleBtn) {
-    const currentTheme = localStorage.getItem("music-theme");
+    let oldTheme = "light";
+    try {
+      if (localStorage.getItem("music-theme") === "dark") oldTheme = "dark";
+    } catch {}
+    const currentTheme = readSetting("music-theme", oldTheme);
     if (currentTheme === "dark") document.body.classList.add("dark-mode");
     themeToggleBtn.addEventListener("click", () => {
       document.body.classList.toggle("dark-mode");
       let theme = document.body.classList.contains("dark-mode")
         ? "dark"
         : "light";
-      localStorage.setItem("music-theme", theme);
+      saveSetting("music-theme", theme);
       initVanta(); // 刷新 Vanta 颜色
     });
   }
@@ -914,7 +594,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // === 2. 监听音乐律动数据 ===
     window.addEventListener("message", (e) => {
-      if (e.data && e.data.type === "audioVisualizerData") {
+      if (isPlayerMessage(e) && e.data?.type === "audioVisualizerData" &&
+          Number.isFinite(e.data.amplitude)) {
         // 使用平滑过渡，避免亮度突变过于剧烈
         // 0.3 是平滑系数
         const target = e.data.amplitude;
@@ -1000,7 +681,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // 不需要再循环 fetch 每一个 info.json 了，极大地提升了速度
       const allSongs = await response.json();
 
-      return allSongs;
+      return Array.isArray(allSongs) ? allSongs : [];
     } catch (e) {
       console.error("获取歌曲列表失败:", e);
       return [];
@@ -1027,7 +708,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (newReleaseTrack) newReleaseTrack.innerHTML = skeletonHTML;
 
     const allSongs = await fetchAllSongInfo();
-    allSongsCache = allSongs; // 缓存全局使用
+    if (allSongsCache.length === 0) allSongsCache = allSongs;
+    if (!allSongs.length) {
+      const empty = '<p class="empty-playlist-message">暂无歌曲，请检查曲库清单</p>';
+      if (discoverTrack) discoverTrack.innerHTML = empty;
+      if (newReleaseTrack) newReleaseTrack.innerHTML = empty;
+    }
 
     const createCard = (song) => `
           <div class="content-card" onclick="playSong(${song.id})" data-id="${song.id}">
@@ -1164,6 +850,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const grid = document.querySelector("#favorites-grid");
     if (!grid) return;
     grid.innerHTML = "";
+    document.getElementById("favorite-count").textContent = favoritesCache.length;
     if (!favoritesCache || favoritesCache.length === 0) {
       grid.innerHTML =
         '<p class="empty-playlist-message">还没有收藏的音乐哦</p>';
@@ -1289,8 +976,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // =======================================
   // 6. 持久化播放器通信 (Iframe Remote Control)
   // =======================================
-  const playerIframe = document.getElementById("player-iframe");
-
   // 底部栏元素
   const bottomBar = {
     img: document.querySelector(".player-controls .now-playing img"),
@@ -1310,10 +995,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     volumeBar: document.querySelector(".player-controls .volume-bar"),
   };
 
-  function postCommand(cmd) {
-    if (playerIframe && playerIframe.contentWindow) {
-      playerIframe.contentWindow.postMessage(cmd, "*");
+  function sendToPlayer(command) {
+    playerIframe.contentWindow?.postMessage(command, window.location.origin);
+  }
+
+  function postCommand(command) {
+    if (playerReady) {
+      sendToPlayer(command);
+      return;
     }
+    if (playerLoadFailed) {
+      showToast("曲库未加载，请刷新页面后重试");
+      return;
+    }
+    // 加载期间只保留最后一次点歌。
+    if (command.type === "loadAndPlay" || command.type === "loadAndPlayMV") {
+      pendingPlay = command;
+    }
+    showToast("播放器正在加载");
   }
 
   // 全局播放函数 (给 HTML onclick 使用)
@@ -1349,12 +1048,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 监听 Iframe 消息
   window.addEventListener("message", (event) => {
+    if (!isPlayerMessage(event)) return;
     const data = event.data;
-    if (!data || !data.type) return;
+    if (!data || typeof data.type !== "string") return;
 
     switch (data.type) {
       case "closeFullPlayer":
-        console.log("[APP] 收到关闭指令"); // 打开控制台看有没有这行字
 
         const fullPlayerModal = document.getElementById("full-player-modal");
         const bottomControls = document.querySelector(".player-controls");
@@ -1374,10 +1073,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         break;
       case "playerReady":
-        console.log("[APP] Player Iframe Ready");
-        postCommand({ type: "requestFullState" });
-        postCommand({ type: "requestAllSongs" });
-        postCommand({ type: "requestRecentlyPlayed" });
+        if (playerReady) break;
+        playerReady = true;
+        playerLoadFailed = false;
+        sendToPlayer({ type: "requestFullState" });
+        sendToPlayer({ type: "requestAllSongs" });
+        sendToPlayer({ type: "requestRecentlyPlayed" });
+        if (pendingPlay) {
+          sendToPlayer(pendingPlay);
+          pendingPlay = null;
+        }
+        break;
+
+      case "playerLoadError":
+        playerReady = false;
+        playerLoadFailed = true;
+        pendingPlay = null;
+        showToast("曲库加载失败，请刷新页面后重试");
+        break;
+
+      case "playerNotice":
+        if (typeof data.message === "string") showToast(data.message);
         break;
 
       case "playerStateUpdate":
@@ -1442,6 +1158,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       ? "icon/24gl-pause.png"
       : "icon/24gl-play.png";
     bottomBar.totalTime.textContent = formatTime(state.duration);
+    if (!isSeeking) {
+      bottomBar.currTime.textContent = formatTime(state.currentTime);
+      const progress = state.duration ? state.currentTime / state.duration : 0;
+      bottomBar.progress.style.width = (progress * 100) + "%";
+    }
 
     if (state.isFavorite) {
       bottomBar.favIcon.src = "icon/24gl-heart-filled.png";
@@ -1488,6 +1209,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
   bottomBar.repeatBtn.addEventListener("click", () =>
     postCommand({ type: "toggleRepeat" })
+  );
+  document.getElementById("bottom-btn-volume").addEventListener("click", () =>
+    postCommand({ type: "toggleMute" })
   );
 
   // 进度条拖拽
@@ -1615,14 +1339,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // 登录弹窗
-  const loginModal = document.getElementById("loginModal");
-  document
-    .getElementById("showLoginBtn")
-    .addEventListener("click", () => loginModal.classList.add("show"));
-  document
-    .getElementById("closeLoginBtn")
-    .addEventListener("click", () => loginModal.classList.remove("show"));
+  document.getElementById("open-local-profile").addEventListener("click", () => {
+    switchView("mymusic");
+    document.querySelector('.nav-item-music[data-tab="edit-profile"]').click();
+  });
 
   // 智能搜索
   const searchInput = document.querySelector(".search-input");
@@ -1643,7 +1363,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       ? matches
           .map(
             (s) => `
-          <div class="search-item" onclick="playSong(${s.id}); document.querySelector('.search-input').value=''; document.getElementById('search-dropdown').classList.remove('show');">
+          <div class="search-item" data-song-id="${s.id}" onclick="playSong(${s.id}); document.querySelector('.search-input').value=''; document.getElementById('search-dropdown').classList.remove('show');">
               <img src="${s.cover}"><div class="search-item-info"><div class="search-item-title">${s.title}</div><div class="search-item-artist">${s.artist}</div></div>
           </div>
       `
@@ -1673,19 +1393,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Toast
-  window.showToast = (msg) => {
+  let toastTimer;
+  function showToast(msg) {
     const t = document.getElementById("toast-notification");
     document.getElementById("toast-message").textContent = msg;
     t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2000);
-  };
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 2000);
+  }
 
   // =======================================
   // 8. 初始化
   // =======================================
   renderHomepageSections();
 
-  // 在 DOMContentLoaded 内部
+  // 歌曲右键菜单
   const contextMenu = document.getElementById("context-menu");
   let contextMenuTargetId = null;
 
@@ -1696,46 +1418,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       ".music-card, .content-card, .playlist-item, .search-item"
     );
 
-    if (card) {
-      e.preventDefault(); // 阻止默认菜单
-
-      // 获取歌曲ID (这取决于你的 HTML 是否有 data-id 或 href 包含 id)
-      // 假设你的卡片结构里有 data-id 或 onclick 里包含 id
-      // 这里我们需要从 DOM 解析 ID，或者 data-song-id 属性
-      // 建议你在生成 HTML 时给所有卡片加 data-song-id="..."
-      let songId = card.dataset.songId;
-
-      // 兼容：如果是 <a> 标签 href="...?play=123"
-      if (!songId && card.tagName === "A") {
-        const urlParams = new URLSearchParams(card.search);
-        songId = urlParams.get("play");
-      }
-
-      if (songId) {
-        contextMenuTargetId = parseInt(songId);
-
-        // 计算菜单位置 (防止溢出屏幕)
-        let x = e.clientX;
-        let y = e.clientY;
-        const menuWidth = 160;
-        const menuHeight = 180;
-
-        if (x + menuWidth > window.innerWidth) x -= menuWidth;
-        if (y + menuHeight > window.innerHeight) y -= menuHeight;
-
-        contextMenu.style.left = `${x}px`;
-        contextMenu.style.top = `${y}px`;
-        contextMenu.classList.add("show");
-      }
-    } else {
+    const rawId = card?.dataset.songId ?? card?.dataset.id;
+    const id = Number(rawId);
+    if (rawId === undefined || rawId === "" || !Number.isSafeInteger(id) || id < 0) {
       contextMenu.classList.remove("show");
+      return;
     }
+
+    e.preventDefault();
+    contextMenuTargetId = id;
+    const x = Math.max(0, Math.min(e.clientX, window.innerWidth - 160));
+    const y = Math.max(0, Math.min(e.clientY, window.innerHeight - 180));
+    contextMenu.style.left = x + "px";
+    contextMenu.style.top = y + "px";
+    contextMenu.classList.add("show");
   });
 
   // 2. 点击菜单项
   contextMenu.addEventListener("click", (e) => {
     const item = e.target.closest(".menu-item");
-    if (!item || !contextMenuTargetId) return;
+    if (!item || contextMenuTargetId === null) return;
 
     const action = item.dataset.action;
 
@@ -1745,13 +1447,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       postCommand({ type: "addToNext", id: contextMenuTargetId });
       showToast("已添加到下一首播放");
     } else if (action === "fav") {
-      // 需要逻辑支持收藏特定ID，目前 toggleFavorite 是针对当前播放的
-      // 简单处理：先播放再收藏，或者你需要扩展 iframe 的通信协议支持 `toggleFavoriteById`
-      postCommand({ type: "loadAndPlay", id: contextMenuTargetId });
-      setTimeout(() => postCommand({ type: "toggleFavorite" }), 500);
-    } else if (action === "download") {
-      alert("下载功能演示：开始下载歌曲...");
+      postCommand({ type: "toggleFavorite", id: contextMenuTargetId });
     }
+    contextMenuTargetId = null;
 
     contextMenu.classList.remove("show");
   });
@@ -1768,7 +1466,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     (e) => {
       e.preventDefault(); // 防止页面滚动
 
-      // 获取当前音量 (你需要维护一个 currentVolume 变量或者从 state 获取)
       let newVolume = currentIframeState.volume || 0.5;
 
       // 滚轮向下(deltaY > 0) 减音量，向上 加音量
@@ -1790,7 +1487,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     { passive: false }
   );
   // =======================================
-  // 21. (新增) 全局键盘快捷键
+  // 21. 全局键盘快捷键
   // =======================================
   document.addEventListener("keydown", (e) => {
     // 如果焦点在输入框内，不触发快捷键
@@ -1821,7 +1518,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
   // =======================================
-  // 22. (新增) 拖拽交互
+  // 22. 拖拽交互
   // =======================================
   function initDragAndDrop() {
     // 1. 让所有歌曲卡片可拖拽
@@ -1881,7 +1578,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* --- app.js --- */
 
   // =======================================
-  // 24. (新增) 全局 3D 视差效果
+  // 24. 全局 3D 视差效果
   // =======================================
   function initGlobalParallax() {
     const layeredElements = [
@@ -1926,10 +1623,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   /* --- app.js --- */
   /* --- app.js --- */
 
-  // ... (保留之前的代码) ...
 
   // =======================================
-  // 25. (新增) 首页 Vanta 滚动吸附 (Hero -> Discover)
+  // 25. 首页 Vanta 滚动吸附 (Hero -> Discover)
   // =======================================
   let isHeroScrolling = false;
 
@@ -1974,7 +1670,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   ); // passive: false 允许我们使用 preventDefault
 
   // =======================================
-  // 26. (新增) 排行榜数据同步
+  // 26. 排行榜数据同步
   // =======================================
   function renderDynamicCharts(allSongs) {
     if (!allSongs || allSongs.length === 0) return;
@@ -2022,95 +1718,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       createListHTML(retroSongs);
   }
 
-  // =======================================
-  // 27. (修复版) 用户资料持久化
-  // =======================================
-
-  // 默认资料
-  const defaultProfile = {
-    username: "DOGE",
-    bio: "音乐爱好者",
-    avatar:
-      "https://th.bing.com/th/id/OIP.oFazgA0xj09WmTqa4k3nRAAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3",
-  };
-
-  // 加载资料函数
-  // app.js
-
-  function loadUserProfile() {
-    console.log("[UserProfile] 开始加载用户资料...");
-
-    // 1. 读取数据
-    let profile = {
-      username: "DOGE",
-      bio: "音乐爱好者",
-      avatar:
-        "https://th.bing.com/th/id/OIP.oFazgA0xj09WmTqa4k3nRAAAAA?w=195&h=195&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3",
-    };
-
-    const savedData = localStorage.getItem("music_user_profile");
-    if (savedData) {
-      try {
-        profile = JSON.parse(savedData);
-      } catch (e) {}
-    }
-
-    // 2. 更新侧边栏 (Sidebar)
-    const sidebarName = document.querySelector(".music-sidebar .profile h2");
-    const sidebarBio = document.querySelector(".music-sidebar .profile p");
-    const sidebarImg = document.querySelector(".music-sidebar .profile-img");
-
-    if (sidebarName) sidebarName.textContent = profile.username;
-    if (sidebarBio) sidebarBio.textContent = profile.bio;
-    if (sidebarImg) sidebarImg.src = profile.avatar;
-
-    // 3. 更新编辑预览区
-    const previewName = document.querySelector(".profile-preview h3");
-    const previewBio = document.querySelector(".profile-preview .preview-bio");
-    const previewImg = document.querySelector(
-      ".profile-preview .preview-avatar"
-    );
-
-    if (previewName) previewName.textContent = profile.username;
-    if (previewBio) previewBio.textContent = profile.bio;
-    if (previewImg) previewImg.src = profile.avatar;
-
-    // 4. 更新输入框
-    const inputName = document.getElementById("editUsername");
-    const inputBio = document.getElementById("editBio");
-    if (inputName) inputName.value = profile.username;
-    if (inputBio) inputBio.value = profile.bio;
-
-    // 5. 更新头像选择状态
-    document.querySelectorAll(".avatar-option-edit").forEach((img) => {
-      if (img.src === profile.avatar) img.classList.add("selected");
-      else img.classList.remove("selected");
-    });
-
-    // ==========================================
-    // 【新增】同步发送给全屏播放器 (Iframe)
-    // ==========================================
-    const playerIframe = document.getElementById("player-iframe");
-    if (playerIframe && playerIframe.contentWindow) {
-      playerIframe.contentWindow.postMessage(
-        {
-          type: "updateUserProfile", // 新的消息类型
-          avatar: profile.avatar,
-          username: profile.username,
-        },
-        "*"
-      );
-    }
-  }
-
   initTiltEffects();
-  // 记得调用它
-
-  renderHomepageSections();
-  // 2. 加载用户资料
-  loadUserProfile();
   initGlobalParallax();
-  UserSystem.init();
+  initLocalProfile(showToast);
+  playerIframe.addEventListener("load", () => sendToPlayer({ type: "requestReady" }));
+  sendToPlayer({ type: "requestReady" });
 });
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
@@ -2291,6 +1903,7 @@ window.addEventListener("scroll", () => {
 });
 
 function initCarouselControls() {
+  if (typeof gsap === "undefined") return;
   // 为每个轮播容器添加唯一标识，避免重复初始化
   document
     .querySelectorAll(".content-carousel-container:not([data-initialized])")

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Space Music - 星籁</title>
+    <title>星乐 Space Music V7</title>
     <!-- 字体图标 -->
     <link
       rel="stylesheet"
@@ -99,30 +99,7 @@
         </nav>
 
         <div class="nav-controls">
-          <!-- 1. 未登录状态显示的按钮 -->
-          <button class="login-register" id="showLoginBtn">登录/注册</button>
-
-          <!-- 2. 登录后显示的头像区域 (默认隐藏) -->
-          <div
-            class="header-user-container"
-            id="headerUserContainer"
-            style="display: none"
-          >
-            <img src="" alt="User" id="headerUserAvatar" />
-            <!-- 头像下拉菜单 -->
-            <div class="header-user-dropdown">
-              <div class="dropdown-item" id="headerToMyMusic">
-                <i class="fas fa-music"></i> 我的音乐
-              </div>
-              <div class="dropdown-item" id="headerEditProfile">
-                <i class="fas fa-user-edit"></i> 编辑资料
-              </div>
-              <div class="dropdown-divider"></div>
-              <div class="dropdown-item logout" id="headerLogout">
-                <i class="fas fa-sign-out-alt"></i> 退出登录
-              </div>
-            </div>
-          </div>
+          <button class="login-register" id="open-local-profile">本机资料</button>
 
           <button id="theme-toggle-btn" class="theme-toggle" title="切换主题">
             <i class="fas fa-sun sun-icon"></i>
@@ -347,16 +324,8 @@
 
             <div class="stats">
               <div class="stat-item">
-                <div class="stat-value">128</div>
+                <div class="stat-value" id="favorite-count">0</div>
                 <div class="stat-label">收藏</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-value">42</div>
-                <div class="stat-label">关注</div>
-              </div>
-              <div class="stat-item">
-                <div class="stat-value">1,256</div>
-                <div class="stat-label">粉丝</div>
               </div>
             </div>
 
@@ -440,7 +409,7 @@
                     <input
                       type="file"
                       id="localAvatarInput"
-                      accept="image/*"
+                      accept="image/png,image/jpeg,image/webp"
                       hidden
                     />
 
@@ -502,6 +471,7 @@
                       <input
                         type="text"
                         id="editUsername"
+                        maxlength="24"
                         class="modern-input"
                         placeholder="给取个好听的名字吧"
                       />
@@ -510,8 +480,9 @@
                       <label>个人简介</label>
                       <textarea
                         id="editBio"
+                        maxlength="120"
                         class="modern-textarea"
-                        placeholder="写下你的实现音乐宣言..."
+                        placeholder="写一段简介"
                         rows="5"
                       ></textarea>
                     </div>
@@ -523,44 +494,6 @@
                     </button>
                   </div>
 
-                  <!-- === 替换开始：账户安全区域 === -->
-                  <div class="edit-form-card glass-panel security-panel">
-                    <h3><i class="fas fa-shield-alt"></i> 账户安全</h3>
-
-                    <!-- 邮箱行：使用 Flex 布局让修改按钮靠右且美观 -->
-                    <div class="security-row">
-                      <span id="displayEmail" class="email-text"
-                        >绑定邮箱: 加载中...</span
-                      >
-                      <!-- 这里使用了新的类名 btn-text-edit -->
-                      <button
-                        class="btn-text-edit"
-                        id="btnChangeEmail"
-                        type="button"
-                      >
-                        <i class="fas fa-pen"></i> 修改
-                      </button>
-                    </div>
-
-                    <!-- 底部操作按钮 -->
-                    <div class="security-actions">
-                      <button
-                        class="btn-security btn-outline"
-                        id="btnChangePassword"
-                        type="button"
-                      >
-                        <i class="fas fa-key"></i> 更改密码
-                      </button>
-                      <button
-                        class="btn-security btn-danger"
-                        id="btnDeleteAccount"
-                        type="button"
-                      >
-                        <i class="fas fa-trash-alt"></i> 注销账户
-                      </button>
-                    </div>
-                  </div>
-                  <!-- === 替换结束 === -->
                 </div>
               </div>
             </div>
@@ -648,54 +581,6 @@
       </div>
     </div>
 
-    <!-- 登录模态框 -->
-    <div class="modal-overlay" id="loginModal">
-      <div class="modal-content login-modal-glass">
-        <span class="close-modal" id="closeLoginBtn">&times;</span>
-        <div class="login-header">
-          <div class="login-logo"><i class="fas fa-music"></i></div>
-          <h2 class="modal-title">欢迎回到 Space Music</h2>
-          <p class="modal-subtitle">与星辰一同律动</p>
-        </div>
-
-        <form id="loginForm" class="login-form">
-          <div class="input-group">
-            <i class="fas fa-user input-icon"></i>
-            <input
-              type="text"
-              id="loginUsernameInput"
-              class="glass-input"
-              placeholder=" "
-              required
-              autocomplete="off"
-            />
-            <label class="floating-label">账号 / 邮箱</label>
-          </div>
-
-          <div class="input-group">
-            <i class="fas fa-lock input-icon"></i>
-            <input
-              type="password"
-              id="loginPasswordInput"
-              class="glass-input"
-              placeholder=" "
-              required
-            />
-            <label class="floating-label">密码</label>
-          </div>
-
-          <button type="submit" class="login-btn glow-btn">
-            <span>立即登录</span>
-            <i class="fas fa-arrow-right"></i>
-          </button>
-        </form>
-
-        <div class="modal-footer">
-          <p>演示账号: <span>admin</span> / 密码: <span>123456</span></p>
-        </div>
-      </div>
-    </div>
-
     <!-- 全屏播放器 Iframe 模态框 -->
     <div id="full-player-modal">
       <!-- 核心音频逻辑在此 Iframe 中运行，确保切换页面不断连 -->
@@ -722,7 +607,7 @@
     <!-- Toast 提示 -->
     <div id="toast-notification" class="toast-notification">
       <i class="fas fa-check-circle"></i>
-      <span id="toast-message">已添加到下一首播放</span>
+      <span id="toast-message" role="status"></span>
     </div>
     <div id="context-menu" class="context-menu">
       <div class="menu-item" data-action="play">
@@ -735,11 +620,10 @@
         <i class="fas fa-heart"></i> 收藏 / 取消
       </div>
       <div class="divider"></div>
-      <div class="menu-item" data-action="download">
-        <i class="fas fa-download"></i> 下载歌曲
-      </div>
     </div>
     <!-- 逻辑脚本 -->
+    <script src="storage.js"></script>
+    <script src="profile.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
